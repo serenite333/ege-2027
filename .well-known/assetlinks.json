@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.serenite333.twa",
+        "sha256_cert_fingerprints": ["D8:B5:86:81:A8:68:05:36:5A:2A:6A:B6:76:F6:09:00:EA:55:DA:A2:CA:15:09:17:49:11:4C:8E:52:35:F2:3E"]
+      }
+    }]
