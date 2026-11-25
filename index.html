@@ -1,0 +1,3766 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="theme-color" content="#0f1115" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>ЕГЭ-2027: Физика • Математика • Русский</title>
+  <style>
+    /* Design tokens & default Graphite theme */
+    :root {
+      --bg: #0f1115;
+      --header-bg: rgba(15, 17, 21, 0.92);
+      --surface: #181b21;
+      --surface-alt: #21252e;
+      --border: #2c313d;
+      --text: #f0f2f5;
+      --text-muted: #939aa6;
+      --accent: #4f8ff7;
+      --accent-soft: rgba(79, 143, 247, 0.15);
+      --pattern-color: rgba(255, 255, 255, 0.045);
+      --green: #22c55e;
+      --green-soft: rgba(34, 197, 94, 0.15);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.15);
+      --red: #ef4444;
+      --red-soft: rgba(239, 68, 68, 0.15);
+      --purple: #a855f7;
+      --purple-soft: rgba(168, 85, 247, 0.15);
+      --radius: 18px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      width: 100%;
+      max-width: 100%;
+      min-height: 100dvh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      transition: background-color 0.22s ease, color 0.22s ease;
+    }
+
+    body {
+      padding-bottom: 104px;
+    }
+
+    /* Centered background patterns (grid removed) */
+    body.pattern-none { background-image: none; }
+    body.pattern-dots {
+      background-image: radial-gradient(var(--pattern-color) 1.5px, transparent 1.5px);
+      background-size: 18px 18px;
+      background-position: center top;
+      background-attachment: fixed;
+    }
+    body.pattern-diag {
+      background-image: repeating-linear-gradient(
+        -45deg,
+        var(--pattern-color) 0,
+        var(--pattern-color) 1px,
+        transparent 1px,
+        transparent 14px
+      );
+      background-position: center top;
+      background-attachment: fixed;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 16px;
+      overflow-x: hidden;
+    }
+
+    /* Sticky header */
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--header-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 16px 11px;
+      margin: 0 -16px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .header-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .sync-badge {
+      background: var(--surface-alt);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sync-badge.ok { background: var(--green-soft); color: var(--green); border-color: rgba(34, 197, 94, 0.3); }
+    .sync-badge.busy { background: var(--amber-soft); color: var(--amber); border-color: rgba(245, 158, 11, 0.3); }
+    .sync-badge.err { background: var(--red-soft); color: var(--red); border-color: rgba(239, 68, 68, 0.3); }
+
+    .pwa-btn {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(79, 143, 247, 0.35);
+      border-radius: 12px;
+      padding: 7px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .pwa-btn:active { transform: scale(0.96); }
+
+    /* Cards & typography */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      width: 100%;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      width: 100%;
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      display: block;
+      transition: transform 0.14s ease, opacity 0.15s ease;
+    }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-secondary {
+      width: 100%;
+      background: var(--surface-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      display: block;
+    }
+    .btn-secondary:active { transform: scale(0.98); }
+
+    .danger-btn {
+      width: 100%;
+      background: var(--red-soft);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: var(--radius-sm);
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+    .danger-btn:active { transform: scale(0.98); }
+
+    .back-btn {
+      background: var(--surface-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 13px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-btn:active { transform: scale(0.96); }
+
+    /* Animated 3-Step Onboarding Screen (in-flow inside #appRoot, never blocks pointer events when inactive) */
+    .onboard-wrap {
+      min-height: calc(100dvh - 84px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 12px 0;
+    }
+    .onboard-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 26px 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.38);
+      position: relative;
+      overflow: hidden;
+    }
+    .onboard-progress {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+    .onboard-bar {
+      height: 5px;
+      flex: 1;
+      border-radius: 99px;
+      background: var(--surface-alt);
+      transition: background-color 0.35s ease;
+    }
+    .onboard-bar.active { background: var(--accent); }
+
+    @keyframes stepReveal {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.97);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .step-animate {
+      animation: stepReveal 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .onboard-title {
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+    .onboard-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .google-oauth-btn {
+      width: 100%;
+      background: #ffffff;
+      color: #111827;
+      border: 1px solid #d1d5db;
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+      transition: transform 0.14s ease;
+    }
+    .google-oauth-btn:active { transform: scale(0.98); }
+
+    /* Subject graphic badges (inline SVG illustrations) */
+    .subj-badge-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 13px;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .subj-badge-img svg, .subj-badge-sm svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .subj-badge-sm {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Profile row */
+    .profile-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .profile-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 22px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .user-name {
+      font-size: 18px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .streak-box {
+      background: var(--amber-soft);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      border-radius: 14px;
+      padding: 7px 11px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .streak-val { font-size: 14px; font-weight: 800; color: var(--amber); line-height: 1.2; }
+    .streak-lbl { font-size: 11px; color: var(--text-muted); }
+
+    .settings-full-btn {
+      width: 100%;
+      margin-top: 12px;
+      background: var(--surface-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .settings-full-btn:active { transform: scale(0.98); border-color: var(--accent); }
+
+    /* Settings sub-tabs bar (4 tabs) */
+    .settings-tabs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    @media (min-width: 480px) {
+      .settings-tabs {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    .stab-btn {
+      background: var(--surface);
+      color: var(--text-muted);
+      border: 1.5px solid var(--border);
+      border-radius: 13px;
+      padding: 10px 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.16s ease;
+    }
+    .stab-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Vertical Drag-Up Confirmation Mini-Test for Reset */
+    .drag-reset-box {
+      margin-top: 12px;
+      background: var(--bg);
+      border: 1.5px solid rgba(239, 68, 68, 0.45);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      animation: stepReveal 0.3s ease forwards;
+    }
+    .drag-track {
+      position: relative;
+      width: 76px;
+      height: 196px;
+      margin: 14px auto 10px;
+      background: var(--surface-alt);
+      border: 2px dashed rgba(239, 68, 68, 0.45);
+      border-radius: 38px;
+      touch-action: none;
+      user-select: none;
+      overflow: hidden;
+    }
+    .drag-fill {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 0%;
+      background: rgba(239, 68, 68, 0.25);
+      pointer-events: none;
+    }
+    .drag-target-zone {
+      position: absolute;
+      top: 10px;
+      left: 0;
+      right: 0;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--red);
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+    .drag-knob {
+      position: absolute;
+      bottom: 6px;
+      left: 6px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--red);
+      color: #ffffff;
+      font-size: 22px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      box-shadow: 0 6px 18px rgba(239, 68, 68, 0.45);
+      touch-action: none;
+    }
+    .drag-knob:active { cursor: grabbing; }
+
+    /* My Errors card */
+    .mistake-card {
+      border-color: rgba(239, 68, 68, 0.35);
+      background: linear-gradient(180deg, var(--surface) 0%, rgba(239, 68, 68, 0.05) 100%);
+    }
+    .mistake-card.clean {
+      border-color: rgba(34, 197, 94, 0.3);
+      background: var(--surface);
+    }
+    .mistake-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--red-soft);
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+
+    /* Score forecast & progress bars */
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .score-pill {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 8px;
+      text-align: center;
+    }
+    .score-pill-val { font-size: 20px; font-weight: 800; color: var(--accent); line-height: 1.2; }
+    .score-pill-lbl { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: var(--surface-alt);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width 0.3s ease;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    /* Vertical selection list */
+    .v-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .v-card-btn {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: transform 0.12s ease, border-color 0.15s ease;
+    }
+    .v-card-btn:active { transform: scale(0.985); border-color: var(--accent); }
+    .v-card-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+    .v-card-arrow { font-size: 18px; color: var(--text-muted); flex-shrink: 0; }
+
+    /* Difficulty badges */
+    .lvl-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+    .lvl-1 { background: var(--green-soft); color: var(--green); }
+    .lvl-2 { background: var(--accent-soft); color: var(--accent); }
+    .lvl-3 { background: var(--purple-soft); color: var(--purple); }
+
+    /* Inputs & problem UI */
+    .text-input {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 13px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+    }
+    .text-input:focus { border-color: var(--accent); }
+
+    .input-row { display: flex; gap: 8px; margin-top: 14px; }
+    .input-row .text-input { flex: 1; min-width: 0; }
+    .input-row .btn-primary { width: auto; padding: 12px 20px; flex-shrink: 0; }
+
+    .svg-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      margin: 12px 0;
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+    }
+
+    /* Stress vowel selector */
+    .stress-word-box {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px;
+      margin: 18px 0;
+      padding: 16px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    .letter-btn {
+      background: var(--surface-alt);
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      min-width: 34px;
+      height: 44px;
+      padding: 0 6px;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .letter-btn.consonant {
+      background: transparent;
+      border-color: transparent;
+      color: var(--text-muted);
+      cursor: default;
+      min-width: 22px;
+      padding: 0 2px;
+    }
+    .letter-btn.correct-letter { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+    .letter-btn.wrong-letter { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+
+    .choice-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .choice-btn {
+      background: var(--surface-alt);
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* SM-2 buttons */
+    .sm2-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 12px; }
+    .sm2-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 4px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .sm2-btn span { font-size: 11px; font-weight: 500; opacity: 0.85; }
+    .sm2-1 { background: var(--red-soft); color: var(--red); }
+    .sm2-2 { background: var(--amber-soft); color: var(--amber); }
+    .sm2-3 { background: var(--accent-soft); color: var(--accent); }
+    .sm2-4 { background: var(--green-soft); color: var(--green); }
+
+    .answer-panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 14px;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .feedback-banner { padding: 10px 14px; border-radius: 12px; font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .fb-ok { background: var(--green-soft); color: var(--green); }
+    .fb-err { background: var(--red-soft); color: var(--red); }
+
+    /* 3D flip cards in Theory */
+    .flip-wrap { perspective: 1000px; margin-bottom: 12px; cursor: pointer; }
+    .flip-inner {
+      display: grid;
+      transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      transform-style: preserve-3d;
+    }
+    .flip-wrap.flipped .flip-inner { transform: rotateY(180deg); }
+    .flip-face {
+      grid-area: 1 / 1;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .flip-back { transform: rotateY(180deg); background: var(--surface-alt); border-color: var(--accent); }
+
+    .th-formula-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .th-rhs { color: var(--accent); transition: filter 0.2s ease; }
+    .blur-rhs .th-rhs { filter: blur(7px); user-select: none; }
+
+    /* Textbook-grade offline formula typography */
+    .math {
+      font-family: "Cambria Math", "STIX Two Text", "Times New Roman", Georgia, serif;
+      font-size: 1.12rem;
+      line-height: 1.65;
+      letter-spacing: 0.02em;
+      font-weight: 500;
+    }
+    .math sup, .math sub {
+      font-size: 0.72em;
+      line-height: 0;
+    }
+    .fbox {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 7px 12px;
+      margin: 4px 0;
+      max-width: 100%;
+    }
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 4px;
+      font-size: 0.92em;
+      line-height: 1.22;
+    }
+    .frac > .num, .frac > span:first-child {
+      border-bottom: 1.5px solid currentColor;
+      padding: 0 4px 2px;
+      text-align: center;
+    }
+    .frac > .den, .frac > span:last-child {
+      padding: 2px 4px 0;
+      text-align: center;
+    }
+    .sqrt {
+      display: inline-flex;
+      align-items: baseline;
+      white-space: nowrap;
+    }
+    .sqrt::before {
+      content: "√";
+      font-size: 1.08em;
+      margin-right: 1px;
+    }
+    .sqrt > span {
+      border-top: 1.4px solid currentColor;
+      padding: 1px 3px 0;
+    }
+
+    /* Theory filter pills & structured back-face readability */
+    .th-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+    .th-pill {
+      background: var(--surface);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 7px 12px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .th-pill.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .th-back-body {
+      font-size: 14.5px;
+      line-height: 1.62;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .th-list {
+      margin: 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .th-list li {
+      padding-left: 2px;
+    }
+    .trap-box {
+      margin-top: 4px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      background: var(--amber-soft);
+      border-left: 3px solid var(--amber);
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--text);
+    }
+
+    .star-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .star-btn.starred { color: var(--amber); }
+
+    /* Calendar */
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .cal-mode-switch {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 4px;
+      margin-bottom: 12px;
+    }
+    .cal-mode-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+    .cal-mode-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+    }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+    .cal-dow { font-size: 12px; font-weight: 700; color: var(--text-muted); padding-bottom: 4px; }
+    .cal-cell {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      background: var(--surface-alt);
+      border: 1px solid transparent;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .cal-cell.week-cell {
+      aspect-ratio: auto;
+      padding: 8px 2px;
+      gap: 4px;
+    }
+    .cal-cell.empty { background: transparent; cursor: default; }
+    .cal-cell.today { border-color: var(--accent); }
+    .cal-cell.selected { background: var(--accent); color: #ffffff; }
+    .cal-dots { display: flex; gap: 3px; height: 5px; }
+    .dot-active { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
+    .dot-due { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+    .cal-detail-item {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 11px 12px;
+      margin-top: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .cal-detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 3px;
+    }
+    .cal-subject-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+    .cal-topic-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+    .week-summary-card {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+    }
+    .week-summary-card.selected {
+      border-color: var(--accent);
+      background: var(--surface);
+    }
+    .cal-cell.empty { background: transparent; cursor: default; }
+    .cal-cell.today { border-color: var(--accent); }
+    .cal-cell.selected { background: var(--accent); color: #ffffff; }
+    .cal-dots { display: flex; gap: 3px; height: 5px; }
+    .dot-active { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
+    .dot-due { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+
+    /* Gallery avatar upload in Settings */
+    .photo-upload-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+    }
+    .avatar-preview-lg {
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 26px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+    }
+    .avatar-preview-lg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .upload-label-btn {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 11px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      display: block;
+    }
+    .remove-photo-btn {
+      background: var(--red-soft);
+      color: var(--red);
+      border: none;
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 6px;
+      width: 100%;
+    }
+
+    .theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .theme-opt {
+      background: var(--surface-alt);
+      border: 1.5px solid var(--border);
+      border-radius: 13px;
+      padding: 10px 6px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+    }
+    .theme-opt.selected { border-color: var(--accent); background: var(--accent-soft); }
+    .theme-swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.25); }
+
+    .pattern-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .pattern-opt {
+      background: var(--surface-alt);
+      border: 1.5px solid var(--border);
+      border-radius: 13px;
+      padding: 10px 6px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+    }
+    .pattern-opt.selected { border-color: var(--accent); background: var(--accent-soft); }
+    .pattern-thumb { width: 26px; height: 26px; border-radius: 7px; background-color: var(--bg); border: 1px solid var(--border); flex-shrink: 0; }
+    .pattern-thumb.p-dots { background-image: radial-gradient(rgba(130, 130, 130, 0.55) 1.2px, transparent 1.2px); background-size: 7px 7px; }
+    .pattern-thumb.p-diag { background-image: repeating-linear-gradient(-45deg, rgba(130, 130, 130, 0.4) 0, rgba(130, 130, 130, 0.4) 1px, transparent 1px, transparent 6px); }
+
+    .slider-block { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; }
+    .slider-head { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .slider-val { color: var(--accent); font-weight: 800; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+    .backup-textarea {
+      width: 100%;
+      min-height: 76px;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      resize: vertical;
+      outline: none;
+    }
+
+    .status-msg { font-size: 13px; font-weight: 600; padding: 8px 12px; border-radius: 10px; display: none; }
+    .status-msg.show { display: block; }
+
+    /* Bottom navigation bar */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      z-index: 30;
+      background: var(--header-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border);
+      padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
+    }
+    .bottom-nav-inner { width: 100%; max-width: 680px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 2px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .nav-btn.active { color: var(--accent); background: var(--accent-soft); }
+    .nav-icon { font-size: 18px; line-height: 1; }
+
+    /* PWA export modal: pointer-events strictly disabled until .open */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.72);
+      display: none;
+      pointer-events: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open {
+      display: flex;
+      pointer-events: auto;
+    }
+    .modal-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body class="pattern-none">
+  <div class="app-container">
+    <header class="top-header">
+      <div id="headerTitle" class="header-title">ЕГЭ-2027</div>
+      <div class="header-actions">
+        <span id="syncStatusBadge" class="sync-badge">Гость</span>
+        <button id="openSettingsHeaderBtn" class="pwa-btn" type="button" title="Настройки">⚙️</button>
+        <button id="openPwaModalBtn" class="pwa-btn" type="button">📲 PWA</button>
+      </div>
+    </header>
+
+    <main id="appRoot">
+      <div class="card">
+        <div class="card-title">Загрузка тренажёра ЕГЭ-2027...</div>
+        <div class="card-sub">Инициализация карточек и настроек</div>
+      </div>
+    </main>
+  </div>
+
+  <nav id="bottomNav" class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <button class="nav-btn active" data-tab="home" type="button">
+        <span class="nav-icon">🏠</span>
+        <span>Главная</span>
+      </button>
+      <button class="nav-btn" data-tab="trainer" type="button">
+        <span class="nav-icon">⚡</span>
+        <span>Тренажёр</span>
+      </button>
+      <button class="nav-btn" data-tab="theory" type="button">
+        <span class="nav-icon">📘</span>
+        <span>Теория</span>
+      </button>
+      <button class="nav-btn" data-tab="calendar" type="button">
+        <span class="nav-icon">📅</span>
+        <span>Календарь</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- PWA install & clean HTML export modal -->
+  <div id="pwaModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="card-title">Установка и экспорт</div>
+        <button id="closePwaModalBtn" class="back-btn" type="button">✕</button>
+      </div>
+      <div class="card-sub" style="color:var(--text); line-height:1.5;">
+        <strong>Android (Chrome):</strong> открой меню браузера (⋮) и нажми «Установить приложение» или «Добавить на главный экран».<br /><br />
+        <strong>GitHub Pages:</strong> скачай чистый файл ниже и загрузи как <code>index.html</code> в репозиторий.
+      </div>
+      <button id="downloadCleanHtmlBtn" class="btn-primary" type="button">Скачать index.html</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+      function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+      function roundTo(val, digits) { var f = Math.pow(10, digits || 1); return Math.round(val * f) / f; }
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+      function toISO(d) {
+        return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      }
+
+      // Formula typography helpers for crisp offline textbook math rendering
+      function F(num, den) {
+        return '<span class="frac"><span class="num">' + num + '</span><span class="den">' + den + '</span></span>';
+      }
+      function SQ(expr) {
+        return '<span class="sqrt"><span>' + expr + '</span></span>';
+      }
+      function M(expr) {
+        return '<span class="math">' + expr + '</span>';
+      }
+      function FB(expr) {
+        return '<div class="fbox math">' + expr + '</div>';
+      }
+      function TRAP(text) {
+        return '<div class="trap-box"><strong>⚠️ Ловушка ЕГЭ:</strong> ' + text + '</div>';
+      }
+
+      // =====================================================================
+      // 1. THEMES (9), PATTERNS (3, NO GRID) & INLINE SVG SUBJECT BADGES
+      // =====================================================================
+      var THEMES = [
+        {
+          id: "graphite", name: "Графит",
+          vars: {
+            "--bg": "#0f1115", "--header-bg": "rgba(15, 17, 21, 0.92)",
+            "--surface": "#181b21", "--surface-alt": "#21252e", "--border": "#2c313d",
+            "--text": "#f0f2f5", "--text-muted": "#939aa6",
+            "--accent": "#4f8ff7", "--accent-soft": "rgba(79, 143, 247, 0.15)",
+            "--pattern-color": "rgba(255, 255, 255, 0.045)"
+          }
+        },
+        {
+          id: "emerald", name: "Изумруд",
+          vars: {
+            "--bg": "#0c1412", "--header-bg": "rgba(12, 20, 18, 0.92)",
+            "--surface": "#13211d", "--surface-alt": "#1a2e28", "--border": "#254038",
+            "--text": "#e7f5f1", "--text-muted": "#88a89f",
+            "--accent": "#2dd4bf", "--accent-soft": "rgba(45, 212, 191, 0.16)",
+            "--pattern-color": "rgba(45, 212, 191, 0.07)"
+          }
+        },
+        {
+          id: "amethyst", name: "Аметист",
+          vars: {
+            "--bg": "#13101a", "--header-bg": "rgba(19, 16, 26, 0.92)",
+            "--surface": "#1c1826", "--surface-alt": "#262036", "--border": "#362d4d",
+            "--text": "#f2eefc", "--text-muted": "#9e93ba",
+            "--accent": "#a78bfa", "--accent-soft": "rgba(167, 139, 250, 0.16)",
+            "--pattern-color": "rgba(167, 139, 250, 0.07)"
+          }
+        },
+        {
+          id: "amber", name: "Янтарь",
+          vars: {
+            "--bg": "#16120e", "--header-bg": "rgba(22, 18, 14, 0.92)",
+            "--surface": "#211b15", "--surface-alt": "#2e251c", "--border": "#403428",
+            "--text": "#f7f1e8", "--text-muted": "#ab9f90",
+            "--accent": "#f59e0b", "--accent-soft": "rgba(245, 158, 11, 0.16)",
+            "--pattern-color": "rgba(245, 158, 11, 0.07)"
+          }
+        },
+        {
+          id: "ocean", name: "Океан",
+          vars: {
+            "--bg": "#0b131e", "--header-bg": "rgba(11, 19, 30, 0.92)",
+            "--surface": "#121f30", "--surface-alt": "#192b42", "--border": "#233c5c",
+            "--text": "#e8f3fc", "--text-muted": "#87a3bd",
+            "--accent": "#38bdf8", "--accent-soft": "rgba(56, 189, 248, 0.16)",
+            "--pattern-color": "rgba(56, 189, 248, 0.07)"
+          }
+        },
+        {
+          id: "chocolate", name: "Шоколад",
+          vars: {
+            "--bg": "#120d0b", "--header-bg": "rgba(18, 13, 11, 0.94)",
+            "--surface": "#1b1411", "--surface-alt": "#241b17", "--border": "rgba(214, 188, 168, 0.14)",
+            "--text": "#f3ece7", "--text-muted": "#a8998f",
+            "--accent": "#a67b5b", "--accent-soft": "rgba(166, 123, 91, 0.16)",
+            "--pattern-color": "rgba(214, 188, 168, 0.06)"
+          }
+        },
+        {
+          id: "pink", name: "Нежный розовый",
+          vars: {
+            "--bg": "#181215", "--header-bg": "rgba(24, 18, 21, 0.92)",
+            "--surface": "#241b20", "--surface-alt": "#30232a", "--border": "#3a2b33",
+            "--text": "#f9eef2", "--text-muted": "#b096a1",
+            "--accent": "#f4a6b8", "--accent-soft": "rgba(244, 166, 184, 0.18)",
+            "--pattern-color": "rgba(244, 166, 184, 0.07)"
+          }
+        },
+        {
+          id: "bordeaux", name: "Бордо",
+          vars: {
+            "--bg": "#14080a", "--header-bg": "rgba(20, 8, 10, 0.94)",
+            "--surface": "#200d11", "--surface-alt": "#2c1318", "--border": "#3f1c24",
+            "--text": "#f8ecee", "--text-muted": "#b09198",
+            "--accent": "#d94e64", "--accent-soft": "rgba(217, 78, 100, 0.18)",
+            "--pattern-color": "rgba(217, 78, 100, 0.07)"
+          }
+        },
+        {
+          id: "light", name: "Светлая",
+          vars: {
+            "--bg": "#f4f6f9", "--header-bg": "rgba(244, 246, 249, 0.92)",
+            "--surface": "#ffffff", "--surface-alt": "#e9edf3", "--border": "#d2d9e4",
+            "--text": "#111827", "--text-muted": "#5b6577",
+            "--accent": "#2563eb", "--accent-soft": "rgba(37, 99, 235, 0.12)",
+            "--pattern-color": "rgba(17, 24, 39, 0.06)"
+          }
+        }
+      ];
+
+      var PATTERNS = [
+        { id: "none", name: "Без узора", thumbCls: "" },
+        { id: "dots", name: "Точки", thumbCls: "p-dots" },
+        { id: "diag", name: "Геометрия", thumbCls: "p-diag" }
+      ];
+
+      function applyAppearance(themeId, patternId) {
+        var t = THEMES.find(function (x) { return x.id === themeId; }) || THEMES[0];
+        var rootStyle = document.documentElement.style;
+        Object.keys(t.vars).forEach(function (k) {
+          rootStyle.setProperty(k, t.vars[k]);
+        });
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", t.vars["--bg"]);
+
+        PATTERNS.forEach(function (p) { document.body.classList.remove("pattern-" + p.id); });
+        var normalized = (patternId === "grid" || !PATTERNS.some(function (p) { return p.id === patternId; })) ? "none" : patternId;
+        document.body.classList.add("pattern-" + normalized);
+      }
+
+      function getGoogleSvg() {
+        return '<svg width="18" height="18" viewBox="0 0 48 48">' +
+          '<path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>' +
+          '<path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>' +
+          '<path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>' +
+          '<path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>' +
+        '</svg>';
+      }
+
+      function getSubjectBadgeHtml(sub, isSmall) {
+        var cls = isSmall ? "subj-badge-sm" : "subj-badge-img";
+        if (sub === "physics") {
+          return '<div class="' + cls + '" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);">' +
+            '<svg viewBox="0 0 64 64">' +
+              '<ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(-28 32 32)" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="2"/>' +
+              '<ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(28 32 32)" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="2"/>' +
+              '<rect x="6" y="21" width="52" height="22" rx="6" fill="rgba(15,23,42,0.78)"/>' +
+              '<text x="32" y="36" text-anchor="middle" fill="#ffffff" font-family="Georgia,serif" font-style="italic" font-weight="bold" font-size="13">E=mc²</text>' +
+            '</svg></div>';
+        }
+        if (sub === "math") {
+          return '<div class="' + cls + '" style="background:linear-gradient(135deg,#5b21b6,#8b5cf6);">' +
+            '<svg viewBox="0 0 64 64">' +
+              '<path d="M8 44 Q 20 14, 32 32 T 56 20" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2.5"/>' +
+              '<rect x="8" y="20" width="48" height="24" rx="6" fill="rgba(18,12,36,0.76)"/>' +
+              '<text x="32" y="37" text-anchor="middle" fill="#ffffff" font-family="Georgia,serif" font-weight="bold" font-size="15">∫ f(x)</text>' +
+            '</svg></div>';
+        }
+        if (sub === "russian") {
+          return '<div class="' + cls + '" style="background:linear-gradient(135deg,#9f1239,#e11d48);">' +
+            '<svg viewBox="0 0 64 64">' +
+              '<circle cx="48" cy="16" r="14" fill="rgba(255,255,255,0.16)"/>' +
+              '<rect x="8" y="19" width="48" height="26" rx="6" fill="rgba(34,10,20,0.72)"/>' +
+              '<text x="32" y="37" text-anchor="middle" fill="#ffffff" font-family="Georgia,serif" font-weight="bold" font-size="16">Аа • Ё</text>' +
+            '</svg></div>';
+        }
+        return '<div class="' + cls + '" style="background:linear-gradient(135deg,#334155,#64748b);">' +
+          '<svg viewBox="0 0 64 64"><text x="32" y="38" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-weight="800" font-size="16">ЕГЭ</text></svg></div>';
+      }
+
+      // =====================================================================
+      // 2. TRAINER QUESTION BANK (PHYSICS, MATH, RUSSIAN)
+      // =====================================================================
+      var CARDS = [
+        // Physics: Level 1 (Oral)
+        { id: "ph-o-1", subject: "physics", level: 1, type: "oral", topic: "Кинематика", title: "Путь и перемещение", question: "Тело прошло 2 м вправо, затем 2 м влево. Чему равны путь L и модуль перемещения |S|?", answer: "Путь L = 4 м (всегда растёт), модуль перемещения |S| = 0 м (начало и конец совпали)." },
+        { id: "ph-o-2", subject: "physics", level: 1, type: "oral", topic: "Динамика", title: "Сила трения покоя vs скольжения", question: "Брусок массой 2 кг лежит на столе (μ = 0,4). К нему приложили силу 5 Н. Чему равна сила трения?", answer: "5 Н. Максимальное трение скольжения μN = 8 Н. Пока тяга меньше 8 Н, тело покоится и F_тр = 5 Н." },
+        { id: "ph-o-3", subject: "physics", level: 1, type: "oral", topic: "Колебания", title: "Период энергий маятника", question: "Маятник колеблется с периодом T и частотой ν. С каким периодом и частотой меняются его E_к и E_п?", answer: "Период колебаний энергий в 2 раза меньше (T/2), а частота в 2 раза больше (2ν)." },
+        { id: "ph-o-4", subject: "physics", level: 1, type: "oral", topic: "МКТ", title: "Сжатие насыщенного пара", question: "Насыщенный пар при T = const сжали в 2 раза. Как изменились его давление и масса?", answer: "Давление не изменилось (зависит только от T), а масса пара уменьшилась в 2 раза из-за конденсации." },
+        { id: "ph-o-5", subject: "physics", level: 1, type: "oral", topic: "Электродинамика", title: "Отключённый конденсатор", question: "Заряженный конденсатор отключили от батареи и раздвинули пластины в 2 раза. Как изменились q и U?", answer: "Заряд q = const, ёмкость C уменьшилась в 2 раза, напряжение U = q/C выросло в 2 раза." },
+        // Physics: Level 2 (Parametric Problems)
+        {
+          id: "ph-g-1", subject: "physics", level: 2, type: "problem", topic: "Кинематика",
+          title: "Путь при равноускоренном движении",
+          generate: function () {
+            var v0 = pick([0, 2, 4, 5, 10]), a = pick([1, 2, 3, 4]), t = randInt(3, 8);
+            var s = roundTo(v0 * t + 0.5 * a * t * t, 1);
+            return { text: "Тело разгоняется с начальной скоростью v₀ = " + v0 + " м/с и ускорением a = " + a + " м/с² в течение t = " + t + " с. Найдите путь S.", unit: "м", answer: s, steps: ["S = v₀t + at² / 2 = " + v0 + "·" + t + " + " + a + "·" + t + "²/2 = " + s + " м."] };
+          }
+        },
+        {
+          id: "ph-g-2", subject: "physics", level: 2, type: "problem", topic: "Динамика",
+          title: "Наклонная плоскость с трением",
+          generate: function () {
+            var angles = [{ deg: 30, sin: 0.5, cos: 0.866, s: "0,5", c: "0,866" }, { deg: 45, sin: 0.707, cos: 0.707, s: "0,707", c: "0,707" }, { deg: 60, sin: 0.866, cos: 0.5, s: "0,866", c: "0,5" }];
+            var ang = pick(angles), m = randInt(2, 6), mu = roundTo(randInt(10, 35) / 100, 2);
+            var a = roundTo(10 * (ang.sin - mu * ang.cos), 2);
+            return { text: "Брусок массой " + m + " кг скользит вниз по наклонной плоскости (α = " + ang.deg + "°, μ = " + mu + "). Найдите ускорение a (g = 10 м/с²).", unit: "м/с²", answer: a, steps: ["a = g(sin " + ang.deg + "° − μ·cos " + ang.deg + "°) = 10·(" + ang.s + " − " + mu + "·" + ang.c + ") = " + a + " м/с²."] };
+          }
+        },
+        {
+          id: "ph-g-3", subject: "physics", level: 2, type: "problem", topic: "Законы сохранения",
+          title: "Абсолютно неупругий удар",
+          generate: function () {
+            var m1 = randInt(2, 6), v1 = randInt(4, 12), m2 = randInt(2, 8);
+            var u = roundTo((m1 * v1) / (m1 + m2), 2);
+            return { text: "Тележка массой m₁ = " + m1 + " кг движется со скоростью v₁ = " + v1 + " м/с и сцепляется с покоящейся тележкой m₂ = " + m2 + " кг. Найдите их общую скорость.", unit: "м/с", answer: u, steps: ["ЗСИ: u = m₁v₁ / (m₁ + m₂) = (" + m1 + "·" + v1 + ") / (" + m1 + " + " + m2 + ") = " + u + " м/с."] };
+          }
+        },
+        {
+          id: "ph-g-4", subject: "physics", level: 2, type: "problem", topic: "Термодинамика",
+          title: "КПД идеального цикла Карно",
+          generate: function () {
+            var tc = pick([7, 17, 27, 47, 77]), th = tc + pick([100, 150, 200, 300]);
+            var t1 = th + 273, t2 = tc + 273, eta = roundTo(((t1 - t2) / t1) * 100, 1);
+            return { text: "Идеальная машина Карно имеет t₁ = " + th + " °C и t₂ = " + tc + " °C. Найдите КПД в процентах.", unit: "%", answer: eta, steps: ["T₁ = " + t1 + " К, T₂ = " + t2 + " К. η = (T₁ − T₂)/T₁ · 100% = " + eta + "%."] };
+          }
+        },
+        {
+          id: "ph-g-5", subject: "physics", level: 2, type: "problem", topic: "Электродинамика",
+          title: "Закон Ома для полной цепи",
+          generate: function () {
+            var emf = pick([6, 9, 12, 18, 24]), r = pick([1, 2, 3]), R = pick([3, 4, 5, 6, 9]);
+            var I = roundTo(emf / (R + r), 2);
+            return { text: "Источник с ЭДС ℰ = " + emf + " В и r = " + r + " Ом замкнут на резистор R = " + R + " Ом. Найдите силу тока I.", unit: "А", answer: I, steps: ["I = ℰ / (R + r) = " + emf + " / (" + R + " + " + r + ") = " + I + " А."] };
+          }
+        },
+        // Physics: Level 3 (№26 Hard)
+        { id: "ph-h-1", subject: "physics", level: 3, type: "oral", topic: "№26 Обоснования", title: "ИСО, МТ и нить на блоке", question: "Какие 4 обязательных тезиса прописываются в №26 для двух грузов на нити через неподвижный блок?", answer: "1) СО, связанная с Землёй, — ИСО. 2) Поступательное движение ⇒ материальные точки. 3) Нерастяжимость нити ⇒ a₁ = a₂. 4) Невесомость нити и блока без трения ⇒ T₁ = T₂." },
+        { id: "ph-h-2", subject: "physics", level: 3, type: "oral", topic: "№26 Обоснования", title: "ЗСИ при ударе и ЗСЭ в петле", question: "Как в №26 обосновать ЗСИ при ударе и ЗСЭ в мёртвой петле?", answer: "Для ЗСИ: время удара Δt → 0, импульсом внешних сил пренебрегаем. Для ЗСЭ: трения нет, а сила N ⊥ v⃗ ⇒ работа A_N = 0." },
+
+        // Math: Level 1, 2, 3
+        { id: "ma-o-1", subject: "math", level: 1, type: "oral", topic: "Тригонометрия", title: "Знаки на окружности", question: "В какой четверти угол 5π/6 и чему равны sin(5π/6) и cos(5π/6)?", answer: "Во II четверти: sin(5π/6) = 1/2, cos(5π/6) = −√3/2." },
+        { id: "ma-o-2", subject: "math", level: 1, type: "oral", topic: "Логарифмы", title: "ОДЗ логарифма", question: "Выпишите ОДЗ для log_(x − 2) (7 − x).", answer: "x − 2 > 0, x − 2 ≠ 1, 7 − x > 0 ⇒ x ∈ (2; 3) ∪ (3; 7)." },
+        { id: "ma-o-3", subject: "math", level: 1, type: "oral", topic: "Производная", title: "Максимум по графику f′(x)", question: "Как по графику производной f′(x) найти точку максимума функции f(x)?", answer: "Точка пересечения с осью Ox, где f′(x) меняет знак с «+» на «−»." },
+        {
+          id: "ma-g-1", subject: "math", level: 2, type: "problem", topic: "Логарифмы",
+          title: "Логарифмическое уравнение (№6)",
+          generate: function () {
+            var base = pick([2, 3, 5]), pwr = pick([2, 3]), shift = randInt(1, 9), rhs = Math.pow(base, pwr), x = rhs + shift;
+            return { text: "Решите уравнение: log_" + base + "(x − " + shift + ") = " + pwr + ".", unit: "", answer: x, steps: ["x − " + shift + " = " + base + "^" + pwr + " = " + rhs + " ⇒ x = " + x + "."] };
+          }
+        },
+        {
+          id: "ma-g-2", subject: "math", level: 2, type: "problem", topic: "Производная",
+          title: "Точка минимума (№12)",
+          generate: function () {
+            var k = randInt(3, 12);
+            return { text: "Найдите точку минимума функции y = (x − " + k + ")² · eˣ.", unit: "", answer: k, steps: ["y′ = eˣ(x − " + k + ")(x − " + (k - 2) + "). Знак меняется с − на + в x = " + k + "."] };
+          }
+        },
+        {
+          id: "ma-g-3", subject: "math", level: 2, type: "problem", topic: "Векторы",
+          title: "Длина вектора (№2)",
+          generate: function () {
+            var t = pick([[3, 4, 5], [6, 8, 10], [5, 12, 13], [8, 15, 17]]), x1 = randInt(1, 6), y1 = randInt(1, 6);
+            return { text: "Задан вектор AB⃗ с точками A(" + x1 + "; " + y1 + ") и B(" + (x1 + t[0]) + "; " + (y1 + t[1]) + "). Найдите длину AB⃗.", unit: "", answer: t[2], steps: ["Координаты (" + t[0] + "; " + t[1] + ") ⇒ длина √(" + t[0] + "² + " + t[1] + "²) = " + t[2] + "."] };
+          }
+        },
+        { id: "ma-h-1", subject: "math", level: 3, type: "oral", topic: "№18 Параметры", title: "Касание окружности и прямой", question: "Запишите условие касания прямой Ax + By + C = 0 и окружности с центром (x₀; y₀) радиуса R.", answer: "d = |Ax₀ + By₀ + C| / √(A² + B²) = R." },
+        { id: "ma-h-2", subject: "math", level: 3, type: "oral", topic: "№15 Неравенства", title: "Выкалывание h(x) = 1 в рационализации", question: "Почему в log_h f ≤ 0 нельзя просто перейти к (h − 1)(f − 1) ≤ 0 без ОДЗ?", answer: "Корень h(x) = 1 обращает скобку (h − 1) в 0, но запрещён основанием логарифма — его нужно выколоть." },
+
+        // Russian: Level 1, 2, 3
+        { id: "ru-s-1", subject: "russian", level: 1, type: "stress", topic: "Ударения (№4)", title: "Словник ФИПИ: «квартал»", generate: function () { return { word: "квартал", stressIdx: 5, display: "квартАл", hint: "Во всех значениях ударение падает на 2-й слог." }; } },
+        { id: "ru-s-2", subject: "russian", level: 1, type: "stress", topic: "Ударения (№4)", title: "Словник ФИПИ: «звонит»", generate: function () { return { word: "звонит", stressIdx: 4, display: "звонИт", hint: "Ударение падает на окончание: звонИт, звонЯт." }; } },
+        { id: "ru-s-3", subject: "russian", level: 1, type: "stress", topic: "Ударения (№4)", title: "Словник ФИПИ: «торты»", generate: function () { return { word: "торты", stressIdx: 1, display: "тОрты", hint: "Неподвижное ударение на основе: тОрты, тОртов." }; } },
+        { id: "ru-s-4", subject: "russian", level: 1, type: "stress", topic: "Ударения (№4)", title: "Словник ФИПИ: «баловать»", generate: function () { return { word: "баловать", stressIdx: 5, display: "баловАть", hint: "Ударение на -АТЬ: баловАть, балУясь." }; } },
+        { id: "ru-c-1", subject: "russian", level: 2, type: "choice", topic: "Н и НН (№15)", title: "Н и НН (№15)", generate: function () { return { prompt: "«На столе стояла жаре…ая в масле картошка».", options: ["Н", "НН"], correct: "НН", explain: "Есть зависимое слово («в масле») ⇒ пишется НН." }; } },
+        { id: "ru-c-2", subject: "russian", level: 2, type: "choice", topic: "Н и НН (№15)", title: "Н и НН (№15)", generate: function () { return { prompt: "«Задача была реше…а учеником за пять минут».", options: ["Н", "НН"], correct: "Н", explain: "В кратких причастиях всегда пишется одна Н." }; } },
+        { id: "ru-c-3", subject: "russian", level: 2, type: "choice", topic: "Корни (№9)", title: "Корни (№9)", generate: function () { return { prompt: "Какая гласная пишется в слове «заг…релый»?", options: ["О", "А"], correct: "О", explain: "Корень -гар-/-гор-: без ударения всегда О." }; } },
+        { id: "ru-h-1", subject: "russian", level: 3, type: "oral", topic: "Задание №8", title: "Несогласованное приложение", question: "Исправьте ошибку: «В романе Л.Н. Толстого „Войне и мире“ показана судьба народа».", answer: "При наличии родового слова («в романе») название в кавычках ставится в И.п.: «В романе „Война и мир“...»." }
+      ];
+
+      // =====================================================================
+      // 4. PHYSICS THEORY BANK (SUBJECT -> SECTION -> 3D FLIP CARDS)
+      // =====================================================================
+      var THEORY_TOPICS = {
+        physics: [
+          { id: "mechanics", name: "Механика", desc: "Кинематика, окружность, баллистика, динамика, статика, гидростатика, энергия, импульс, колебания" },
+          { id: "mkt", name: "МКТ и термодинамика", desc: "Уравнение Менделеева–Клапейрона, газовые законы, I закон термодинамики и цикл Карно" },
+          { id: "electrodynamics", name: "Электродинамика", desc: "Закон Кулона, конденсаторы, закон Ома, магнетизм, индукция и колебательный контур" },
+          { id: "optics_quantum", name: "Оптика и кванты", desc: "Преломление света, тонкие линзы, фотоэффект и радиоактивный распад ядра" }
+        ]
+      };
+
+      var THEORY_CARDS = [
+        // ==================== ФИЗИКА (14 КАРТОЧЕК) ====================
+        {
+          id: "ph-t01", subject: "physics", topic: "mechanics", sub: "Кинематика • Основы",
+          name: "Путь, перемещение, средняя и относительная скорость",
+          lhs: M("S<sub>x</sub> = x − x<sub>0</sub>"),
+          rhs: M("v<sub>ср</sub> = " + F("S<sub>весь</sub>", "t<sub>всё</sub>")),
+          unit: "м, м/с • L = |S| только при движении в 1 сторону",
+          explain:
+            FB("v<sub>отн</sub> = |v<sub>2</sub> − v<sub>1</sub>| (в одну сторону) &nbsp;|&nbsp; v<sub>отн</sub> = v<sub>1</sub> + v<sub>2</sub> (навстречу)") +
+            '<ul class="th-list">' +
+              '<li><strong>Путь L ≥ 0</strong> всегда растёт; перемещение <strong>S<sub>x</sub></strong> может быть отрицательным или нулевым.</li>' +
+              '<li>Формула ' + M("v<sub>ср</sub> = " + F("v<sub>0</sub> + v", "2")) + ' работает <strong>только</strong> при равнопеременном движении без разворота.</li>' +
+            '</ul>' +
+            TRAP("Если тело прошло 2 м вправо и 2 м влево, путь L = 4 м, а модуль перемещения |S| = 0 м.")
+        },
+        {
+          id: "ph-t02", subject: "physics", topic: "mechanics", sub: "Кинематика • Графики и РУД",
+          name: "Уравнения равноускоренного движения и графики",
+          lhs: M("x = x<sub>0</sub> + v<sub>0x</sub>t + " + F("a<sub>x</sub>t<sup>2</sup>", "2")),
+          rhs: M("S<sub>x</sub> = " + F("v<sub>x</sub><sup>2</sup> − v<sub>0x</sub><sup>2</sup>", "2a<sub>x</sub>")),
+          unit: "vₓ = v₀ₓ + aₓt • Площадь под vₓ(t) = путь/перемещение",
+          explain:
+            FB("v<sub>x</sub>(t) = v<sub>0x</sub> + a<sub>x</sub>t &nbsp;|&nbsp; a<sub>x</sub> = tg α<sub>v(t)</sub>") +
+            '<ul class="th-list">' +
+              '<li>На графике ' + M("x(t)") + ' наклон касательной равен скорости ' + M("v<sub>x</sub>") + ', вершина параболы — момент разворота (' + M("v<sub>x</sub> = 0") + ').</li>' +
+              '<li>Под графиком ' + M("v<sub>x</sub>(t)") + ': <strong>путь</strong> ' + M("L = S<sub>1</sub> + S<sub>2</sub>") + ', <strong>перемещение</strong> ' + M("S = S<sub>1</sub> − S<sub>2</sub>") + '.</li>' +
+            '</ul>' +
+            TRAP("Всегда проверяй оси графика! На графике vₓ(t) горизонтальная прямая означает равномерное движение, а не покой.")
+        },
+        {
+          id: "ph-t03", subject: "physics", topic: "mechanics", sub: "Кинематика • Окружность",
+          name: "Движение по окружности: ω, v и ускорения",
+          lhs: M("v = ωR = " + F("2πR", "T")),
+          rhs: M("a<sub>ц</sub> = " + F("v<sup>2</sup>", "R") + " = ω<sup>2</sup>R"),
+          unit: "ω = 2π/T = 2πν (рад/с) • Полное: a = √(aц² + aт²)",
+          explain:
+            FB("T = " + F("t", "N") + " &nbsp;|&nbsp; ν = " + F("1", "T") + " &nbsp;|&nbsp; a = " + SQ("a<sub>ц</sub><sup>2</sup> + a<sub>т</sub><sup>2</sup>")) +
+            '<ul class="th-list">' +
+              '<li>У всех точек твёрдого вращающегося диска угловая скорость ' + M("ω") + ' одинакова, а линейная ' + M("v ~ R") + '.</li>' +
+              '<li>' + M("a<sub>ц</sub>") + ' всегда направлено к центру (меняет направление скорости), ' + M("a<sub>т</sub>") + ' — по касательной (меняет модуль).</li>' +
+            '</ul>'
+        },
+        {
+          id: "ph-t04", subject: "physics", topic: "mechanics", sub: "Кинематика • Баллистика",
+          name: "Бросок под углом α к горизонту",
+          lhs: M("x = v<sub>0</sub> cos α · t"),
+          rhs: M("y = y<sub>0</sub> + v<sub>0</sub> sin α · t − " + F("gt<sup>2</sup>", "2")),
+          unit: "В верхней точке v = v₀ cos α, a = g ↓",
+          explain:
+            FB("T = " + F("2v<sub>0</sub> sin α", "g") + " &nbsp;|&nbsp; H = " + F("v<sub>0</sub><sup>2</sup> sin<sup>2</sup>α", "2g") + " &nbsp;|&nbsp; L = " + F("v<sub>0</sub><sup>2</sup> sin 2α", "g")) +
+            '<ul class="th-list">' +
+              '<li>Вдоль оси Ox движение равномерное (' + M("a<sub>x</sub> = 0") + '), вдоль Oy — равнопеременное (' + M("a<sub>y</sub> = −g") + ').</li>' +
+              '<li>Максимальная дальность на ровной поверхности достигается при ' + M("α = 45°") + '.</li>' +
+            '</ul>' +
+            TRAP("Формулы T, H, L не входят в кодификатор для готового применения во 2-й части — их обязательно выводить из уравнений x(t) и y(t)!")
+        },
+        {
+          id: "ph-t05", subject: "physics", topic: "mechanics", sub: "Динамика • Ньютон и гравитация",
+          name: "Законы Ньютона и закон всемирного тяготения",
+          lhs: M("∑F⃗ = m · a⃗"),
+          rhs: M("F = G" + F("m<sub>1</sub>m<sub>2</sub>", "r<sup>2</sup>")),
+          unit: "G = 6,67·10⁻¹¹ Н·м²/кг² • g(h) = GM/(R+h)²",
+          explain:
+            FB("g(h) = G" + F("M", "(R + h)<sup>2</sup>") + " &nbsp;|&nbsp; v<sub>1к</sub> = " + SQ("gR") + " = " + SQ(F("GM", "R"))) +
+            '<ul class="th-list">' +
+              '<li>Законы Ньютона справедливы <strong>только в ИСО</strong> (например, связанной с Землёй).</li>' +
+              '<li>3-й закон: ' + M("F⃗<sub>12</sub> = −F⃗<sub>21</sub>") + ' — силы равны по модулю, противоположны и приложены к <strong>разным</strong> телам.</li>' +
+            '</ul>' +
+            TRAP("На орбите спутника расстояние r = R + h (считается от центра планеты, а не от поверхности!).")
+        },
+        {
+          id: "ph-t06", subject: "physics", topic: "mechanics", sub: "Динамика • Силы",
+          name: "Реакция опоры N, вес P, трение и закон Гука",
+          lhs: M("F<sub>тр.с</sub> = μN"),
+          rhs: M("F<sub>упр</sub> = k · |Δx|"),
+          unit: "Лифт: N = m(g ± a) • Склон: N = mg cos α",
+          explain:
+            FB("N<sub>вверх</sub> = m(g + a) &nbsp;|&nbsp; N<sub>вниз</sub> = m(g − a) &nbsp;|&nbsp; N<sub>склон</sub> = mg cos α") +
+            '<ul class="th-list">' +
+              '<li><strong>Трение покоя:</strong> пока внешняя тяга ' + M("F ≤ μN") + ', тело покоится и ' + M("F<sub>тр.п</sub> = F") + '.</li>' +
+              '<li>Параллельные пружины: ' + M("k<sub>общ</sub> = k<sub>1</sub> + k<sub>2</sub>") + '; последовательные: ' + M(F("1", "k<sub>общ</sub>") + " = " + F("1", "k<sub>1</sub>") + " + " + F("1", "k<sub>2</sub>")) + '.</li>' +
+            '</ul>' +
+            TRAP("Не подставляй автоматически Fтр = μmg! Сначала проверь, сдвинулось ли тело и не наклонена ли сила к горизонту.")
+        },
+        {
+          id: "ph-t07", subject: "physics", topic: "mechanics", sub: "Статика • Равновесие и блоки",
+          name: "Правило моментов и система блоков",
+          lhs: M("M = ±F · L"),
+          rhs: M("∑F⃗ = 0 &nbsp;и&nbsp; ∑M = 0"),
+          unit: "Подвижный блок: выигрыш в силе ×2, проигрыш в пути ×2",
+          explain:
+            FB("F<sub>подв</sub> = " + F("mg", "2") + " &nbsp;|&nbsp; s<sub>нити</sub> = 2h<sub>груза</sub> &nbsp;|&nbsp; a<sub>нити</sub> = 2a<sub>блока</sub>") +
+            '<ul class="th-list">' +
+              '<li><strong>Плечо L</strong> — длина перпендикуляра от оси вращения до линии действия силы.</li>' +
+              '<li>Выбирай ось вращения в точке приложения неизвестной силы (например, в шарнире), чтобы её момент стал равен 0.</li>' +
+            '</ul>'
+        },
+        {
+          id: "ph-t08", subject: "physics", topic: "mechanics", sub: "Гидростатика",
+          name: "Давление жидкости и сила Архимеда",
+          lhs: M("p = p<sub>0</sub> + ρgh"),
+          rhs: M("F<sub>А</sub> = ρ<sub>ж</sub> · g · V<sub>погр</sub>"),
+          unit: "p₀ ≈ 10⁵ Па • Vпогр — только погружённая часть",
+          explain:
+            FB("Тонет: ρ<sub>т</sub> > ρ<sub>ж</sub> &nbsp;|&nbsp; Плавает: F<sub>А</sub> = mg &nbsp;|&nbsp; Всплывает: ρ<sub>т</sub> < ρ<sub>ж</sub>") +
+            '<ul class="th-list">' +
+              '<li>Давление жидкости ' + M("ρgh") + ' не зависит от формы сосуда, а только от глубины ' + M("h") + ' от свободной поверхности.</li>' +
+              '<li>При плавании на поверхности доля погружённого объёма: ' + M(F("V<sub>погр</sub>", "V") + " = " + F("ρ<sub>т</sub>", "ρ<sub>ж</sub>")) + '.</li>' +
+            '</ul>'
+        },
+        {
+          id: "ph-t09", subject: "physics", topic: "mechanics", sub: "Энергия, импульс и удары",
+          name: "Работа, ЗСЭ, ЗСИ и 3 вида ударов",
+          lhs: M("E<sub>к</sub> = " + F("mv<sup>2</sup>", "2") + ", E<sub>п</sub> = mgh | " + F("kx<sup>2</sup>", "2")),
+          rhs: M("F⃗Δt = Δp⃗ &nbsp;|&nbsp; ΔE<sub>мех</sub> = A<sub>неконс</sub>"),
+          unit: "A = F·S·cos α • P = F·v·cos α • η = Aпол/Aзатр",
+          explain:
+            FB("p⃗<sub>1</sub> + p⃗<sub>2</sub> = p⃗<sub>1</sub>′ + p⃗<sub>2</sub>′ &nbsp;|&nbsp; Q = E<sub>к1</sub> − E<sub>к2</sub>") +
+            '<ul class="th-list">' +
+              '<li><strong>Упругий удар:</strong> сохраняются и импульс, и ' + M("E<sub>к</sub>") + '.</li>' +
+              '<li><strong>Абсолютно неупругий удар:</strong> тела слипаются (' + M("u = " + F("m<sub>1</sub>v<sub>1</sub> + m<sub>2</sub>v<sub>2</sub>", "m<sub>1</sub> + m<sub>2</sub>")) + '), часть энергии уходит в тепло ' + M("Q") + '.</li>' +
+            '</ul>' +
+            TRAP("Работа силы реакции опоры N и силы Лоренца всегда равна 0 (они перпендикулярны скорости: cos 90° = 0).")
+        },
+        {
+          id: "ph-t10", subject: "physics", topic: "mechanics", sub: "Колебания и волны",
+          name: "Маятники, гармоники и период энергий",
+          lhs: M("T<sub>нит</sub> = 2π" + SQ(F("l", "g")) + " &nbsp;|&nbsp; T<sub>пруж</sub> = 2π" + SQ(F("m", "k"))),
+          rhs: M("v<sub>max</sub> = ωA &nbsp;|&nbsp; a<sub>max</sub> = ω<sup>2</sup>A"),
+          unit: "Tэнерг = T/2, νэнерг = 2ν • λ = vT = v/ν",
+          explain:
+            FB("x(t) = A cos(ωt + φ<sub>0</sub>) &nbsp;|&nbsp; E = " + F("kA<sup>2</sup>", "2") + " = " + F("mv<sub>max</sub><sup>2</sup>", "2")) +
+            '<ul class="th-list">' +
+              '<li>В положении равновесия (' + M("x = 0") + '): скорость и ' + M("E<sub>к</sub>") + ' максимальны, ускорение и ' + M("E<sub>п</sub>") + ' равны 0.</li>' +
+              '<li>В крайних точках (' + M("x = ±A") + '): ' + M("v = 0") + ', ускорение и ' + M("E<sub>п</sub>") + ' максимальны.</li>' +
+            '</ul>' +
+            TRAP("Период колебаний кинетической и потенциальной энергий в 2 раза меньше периода колебаний маятника (T/2)!")
+        },
+        {
+          id: "ph-t11", subject: "physics", topic: "mkt", sub: "МКТ и термодинамика",
+          name: "Уравнение Менделеева–Клапейрона, I закон и Карно",
+          lhs: M("pV = νRT = " + F("m", "M") + "RT"),
+          rhs: M("Q = ΔU + A &nbsp;|&nbsp; η<sub>К</sub> = " + F("T<sub>н</sub> − T<sub>х</sub>", "T<sub>н</sub>")),
+          unit: "R = 8,31 • U = (3/2)νRT (одноатомный) • T = t°C + 273",
+          explain:
+            FB("p = nkT = " + F("2", "3") + "nE<sub>к</sub> &nbsp;|&nbsp; E<sub>к</sub> = " + F("3", "2") + "kT &nbsp;|&nbsp; φ = " + F("p", "p<sub>н</sub>") + "·100%") +
+            '<ul class="th-list">' +
+              '<li><strong>Изохорный</strong> (' + M("V = const") + '): ' + M("A = 0, Q = ΔU") + '.</li>' +
+              '<li><strong>Изотермический</strong> (' + M("T = const") + '): ' + M("ΔU = 0, Q = A") + '.</li>' +
+              '<li><strong>Изобарный</strong> (' + M("p = const") + '): ' + M("A = pΔV = νRΔT") + '.</li>' +
+              '<li><strong>Адиабатный</strong> (' + M("Q = 0") + '): ' + M("A = −ΔU") + '.</li>' +
+            '</ul>' +
+            TRAP("Давление насыщенного пара pн зависит ТОЛЬКО от температуры и не меняется при изотермическом сжатии (часть пара конденсируется).")
+        },
+        {
+          id: "ph-t12", subject: "physics", topic: "electrodynamics", sub: "Электростатика и ток",
+          name: "Закон Кулона, конденсатор и закон Ома",
+          lhs: M("C = " + F("εε<sub>0</sub>S", "d") + " = " + F("q", "U")),
+          rhs: M("I = " + F("ℰ", "R + r") + " &nbsp;|&nbsp; W = " + F("CU<sup>2</sup>", "2") + " = " + F("q<sup>2</sup>", "2C")),
+          unit: "P = UI = I²R = U²/R • Q = I²Rt",
+          explain:
+            FB("F = k" + F("|q<sub>1</sub>q<sub>2</sub>|", "r<sup>2</sup>") + " &nbsp;|&nbsp; E = " + F("U", "d") + " &nbsp;|&nbsp; U<sub>клемм</sub> = ℰ − Ir") +
+            '<ul class="th-list">' +
+              '<li>Конденсатор <strong>отключён</strong> от батареи ⇒ ' + M("q = const") + '; <strong>подключён</strong> ⇒ ' + M("U = const") + '.</li>' +
+              '<li>Максимальная мощность на внешнем резисторе достигается при ' + M("R = r") + '.</li>' +
+            '</ul>'
+        },
+        {
+          id: "ph-t13", subject: "physics", topic: "electrodynamics", sub: "Магнетизм и индукция",
+          name: "Силы Ампера и Лоренца, индукция и контур",
+          lhs: M("F<sub>А</sub> = IBL sin α &nbsp;|&nbsp; F<sub>Л</sub> = |q|vB sin α"),
+          rhs: M("ℰ<sub>i</sub> = −" + F("ΔΦ", "Δt") + " &nbsp;|&nbsp; T = 2π" + SQ("LC")),
+          unit: "Φ = BS cos α • W_L = LI²/2 • R = mv/(|q|B)",
+          explain:
+            FB("Φ = LI &nbsp;|&nbsp; ℰ<sub>si</sub> = −L" + F("ΔI", "Δt") + " &nbsp;|&nbsp; " + F("LI<sub>max</sub><sup>2</sup>", "2") + " = " + F("CU<sub>max</sub><sup>2</sup>", "2")) +
+            '<ul class="th-list">' +
+              '<li><strong>Правило левой руки:</strong> B входит в ладонь, 4 пальца по току (или скорости «+» заряда; для электрона — <strong>против</strong> скорости!), большой палец — сила.</li>' +
+              '<li><strong>Правило Ленца:</strong> индукционный ток своим полем препятствует изменению магнитного потока.</li>' +
+            '</ul>'
+        },
+        {
+          id: "ph-t14", subject: "physics", topic: "optics_quantum", sub: "Оптика и кванты",
+          name: "Линзы, преломление, фотоэффект и ядро",
+          lhs: M("±" + F("1", "F") + " = " + F("1", "d") + " ± " + F("1", "f")),
+          rhs: M("hν = A<sub>вых</sub> + " + F("mv<sub>max</sub><sup>2</sup>", "2") + " = A<sub>вых</sub> + eU<sub>з</sub>"),
+          unit: "n₁ sin α = n₂ sin β • N = N₀ · 2^(−t/T)",
+          explain:
+            FB("Γ = " + F("f", "d") + " &nbsp;|&nbsp; E<sub>ф</sub> = hν = " + F("hc", "λ") + " &nbsp;|&nbsp; p<sub>ф</sub> = " + F("h", "λ")) +
+            '<ul class="th-list">' +
+              '<li>Рассеивающая линза: перед ' + M("1/F") + ' и ' + M("1/f") + ' ставим <strong>минус</strong>; изображение всегда мнимое, прямое, уменьшенное.</li>' +
+              '<li><strong>α-распад:</strong> ' + M("A − 4, Z − 2") + '; <strong>β<sup>−</sup>-распад:</strong> ' + M("A = const, Z + 1") + '.</li>' +
+            '</ul>' +
+            TRAP("Запирающее напряжение Uз и кинетическая энергия электронов зависят от частоты света ν, но НЕ зависят от его интенсивности!")
+        }
+      ];
+
+      // =====================================================================
+      // 5. STATE, SM-2, MY ERRORS & FIREBASE GOOGLE AUTH
+      // =====================================================================
+      var STORAGE_KEY = "ege_2027_final_v12";
+      var CLOUD_CFG_KEY = "ege_2027_cloud_cfg_v4";
+      var DAY_MS = 24 * 60 * 60 * 1000;
+
+      // Embedded Firebase Web Config for project ege-2027
+      var EMBEDDED_FIREBASE_CONFIG = {
+        apiKey: "AIzaSyCFUT1HNEPPcj0cgG_knsu-JnQex7lpMic",
+        authDomain: "ege-2027.firebaseapp.com",
+        databaseURL: "https://ege-2027-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "ege-2027",
+        storageBucket: "ege-2027.firebasestorage.app",
+        messagingSenderId: "805581509501",
+        appId: "1:805581509501:web:065843d23e11f54cd0b214",
+        measurementId: "G-X7J4KWX312"
+      };
+
+      var defaultCloudCfg = {
+        mode: "none",
+        fbConfigRaw: "",
+        fbUserEmail: "",
+        fbUserUid: ""
+      };
+
+      function loadCloudCfg() {
+        try {
+          var raw = localStorage.getItem(CLOUD_CFG_KEY);
+          if (!raw) return Object.assign({}, defaultCloudCfg);
+          return Object.assign({}, defaultCloudCfg, JSON.parse(raw));
+        } catch (e) {
+          return Object.assign({}, defaultCloudCfg);
+        }
+      }
+
+      var cloudCfg = loadCloudCfg();
+
+      function saveCloudCfg() {
+        try { localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cloudCfg)); } catch (e) {}
+      }
+
+      var defaultState = {
+        onboardingCompleted: false,
+        updatedAt: 0,
+        name: "Ученик",
+        avatarPhoto: "",
+        theme: "graphite",
+        pattern: "none",
+        basePhys: 60,
+        baseMath: 60,
+        baseRus: 60,
+        goalSum: 280,
+        streak: 0,
+        lastActiveISO: null,
+        history: {},
+        historyDetails: {},
+        srs: {},
+        mistakes: {},
+        starredTheory: []
+      };
+
+      function ensureSRS(st) {
+        if (!st.srs) st.srs = {};
+        if (!st.mistakes || typeof st.mistakes !== "object") st.mistakes = {};
+        if (!Array.isArray(st.starredTheory)) st.starredTheory = [];
+        if (!st.history || typeof st.history !== "object") st.history = {};
+        if (!st.historyDetails || typeof st.historyDetails !== "object") st.historyDetails = {};
+        if (typeof st.onboardingCompleted !== "boolean") {
+          st.onboardingCompleted = Boolean(st.onboarded);
+        }
+        CARDS.forEach(function (c) {
+          if (!st.srs[c.id]) {
+            st.srs[c.id] = { rep: 0, interval: 0, ef: 2.5, nextReview: 0, attempts: 0, correct: 0 };
+          }
+        });
+        return st;
+      }
+
+      function loadState() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return ensureSRS(JSON.parse(JSON.stringify(defaultState)));
+          var parsed = JSON.parse(raw);
+          var merged = Object.assign({}, JSON.parse(JSON.stringify(defaultState)), parsed);
+          if (merged.pattern === "grid") merged.pattern = "none";
+          return ensureSRS(merged);
+        } catch (e) {
+          return ensureSRS(JSON.parse(JSON.stringify(defaultState)));
+        }
+      }
+
+      var state = loadState();
+      var syncTimer = null;
+      var syncInFlight = false;
+      var fbRuntime = { app: null, auth: null, db: null, sdkLoaded: false };
+
+      function getAvatarMarkup(name, photoData) {
+        if (photoData) {
+          return '<img src="' + photoData + '" alt="Аватар" />';
+        }
+        var ch = ((name || "У").trim().charAt(0) || "У").toUpperCase();
+        return escapeHtml(ch);
+      }
+
+      function setSyncBadge(kind, text) {
+        var el = document.getElementById("syncStatusBadge");
+        if (!el) return;
+        el.className = "sync-badge" + (kind ? (" " + kind) : "");
+        el.textContent = text;
+      }
+
+      function requestPersistentStorage() {
+        try {
+          if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().catch(function () {});
+          }
+        } catch (e) {}
+      }
+
+      function buildCloudPayload() {
+        var copy = JSON.parse(JSON.stringify(state));
+        copy.avatarPhoto = "";
+        return copy;
+      }
+
+      function applyMergedRemoteState(remoteData) {
+        if (!remoteData || typeof remoteData !== "object" || !remoteData.srs) return false;
+        var remoteTs = Number(remoteData.updatedAt) || 0;
+        var localTs = Number(state.updatedAt) || 0;
+        if (remoteTs <= localTs) return false;
+
+        var keepLocalPhoto = state.avatarPhoto || "";
+        var merged = Object.assign({}, JSON.parse(JSON.stringify(defaultState)), remoteData);
+        if (!merged.avatarPhoto && keepLocalPhoto) merged.avatarPhoto = keepLocalPhoto;
+        merged.onboardingCompleted = true;
+        if (merged.pattern === "grid") merged.pattern = "none";
+        state = ensureSRS(merged);
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+        applyAppearance(state.theme, state.pattern);
+        if (!isSettingsOpen && !isOnboardingActive) renderApp();
+        return true;
+      }
+
+      function loadScriptOnce(src) {
+        return new Promise(function (resolve, reject) {
+          var existing = document.querySelector('script[src="' + src + '"]');
+          if (existing) {
+            if (existing.getAttribute("data-loaded") === "1") return resolve();
+            existing.addEventListener("load", function () { resolve(); });
+            existing.addEventListener("error", function () { reject(new Error("Ошибка загрузки SDK")); });
+            return;
+          }
+          var s = document.createElement("script");
+          s.src = src;
+          s.async = true;
+          s.onload = function () { s.setAttribute("data-loaded", "1"); resolve(); };
+          s.onerror = function () { reject(new Error("Не удалось загрузить Firebase SDK")); };
+          document.head.appendChild(s);
+        });
+      }
+
+      function parseFirebaseConfig(raw) {
+        if (EMBEDDED_FIREBASE_CONFIG && EMBEDDED_FIREBASE_CONFIG.apiKey) return EMBEDDED_FIREBASE_CONFIG;
+        var txt = (raw || "").trim();
+        if (!txt) throw new Error("Вставь Firebase Config во вкладке «Аккаунт и бэкап» в Настройках");
+        var firstBrace = txt.indexOf("{");
+        var lastBrace = txt.lastIndexOf("}");
+        if (firstBrace !== -1 && lastBrace > firstBrace) txt = txt.slice(firstBrace, lastBrace + 1);
+        var jsonReady = txt.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":').replace(/'/g, '"');
+        var cfg = JSON.parse(jsonReady);
+        if (!cfg.apiKey || !cfg.projectId) throw new Error("В конфиге должны быть apiKey и projectId");
+        if (!cfg.databaseURL) cfg.databaseURL = "https://" + cfg.projectId + "-default-rtdb.firebaseio.com";
+        return cfg;
+      }
+
+      function ensureFirebaseReady(rawCfg) {
+        var cfg = parseFirebaseConfig(rawCfg);
+        return loadScriptOnce("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js")
+          .then(function () {
+            return Promise.all([
+              loadScriptOnce("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"),
+              loadScriptOnce("https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js")
+            ]);
+          })
+          .then(function () {
+            if (!window.firebase) throw new Error("Firebase SDK недоступен");
+            if (!window.firebase.apps || !window.firebase.apps.length) {
+              fbRuntime.app = window.firebase.initializeApp(cfg);
+            } else {
+              fbRuntime.app = window.firebase.app();
+            }
+            fbRuntime.auth = window.firebase.auth();
+            fbRuntime.db = window.firebase.database();
+            fbRuntime.sdkLoaded = true;
+            return fbRuntime;
+          });
+      }
+
+      function signInWithGoogleFirebase(rawCfg, onDone) {
+        ensureFirebaseReady(rawCfg)
+          .then(function (rt) {
+            var provider = new window.firebase.auth.GoogleAuthProvider();
+            return rt.auth.signInWithPopup(provider).catch(function (popupErr) {
+              if (popupErr && (popupErr.code === "auth/popup-blocked" || popupErr.code === "auth/operation-not-supported-in-this-environment")) {
+                return rt.auth.signInWithRedirect(provider);
+              }
+              throw popupErr;
+            });
+          })
+          .then(function (res) {
+            var user = res && res.user;
+            if (!user) return;
+            cloudCfg.mode = "firebase";
+            if (rawCfg) cloudCfg.fbConfigRaw = rawCfg;
+            cloudCfg.fbUserEmail = user.email || "Google-аккаунт";
+            cloudCfg.fbUserUid = user.uid;
+            saveCloudCfg();
+            pullCloudState(true);
+            onDone(null, user);
+          })
+          .catch(function (err) {
+            var msg = (err && err.message) || "Ошибка входа через Google";
+            if (err && (err.code === "auth/unauthorized-domain" || msg.indexOf("auth/unauthorized-domain") !== -1)) {
+              msg = "Добавь домен serenite333.github.io в Firebase Console → Authentication → Settings → Authorized domains";
+            } else if (err && (err.code === "auth/operation-not-supported-in-this-environment" || msg.indexOf("operation-not-supported-in-this-environment") !== -1)) {
+              msg = "Вход через Google работает на сайте (https://...), а не во встроенном предпросмотре. Нажми «Продолжить как гость» здесь или проверь на GitHub Pages.";
+            }
+            onDone(new Error(msg));
+          });
+      }
+
+      function signOutGoogleFirebase(onDone) {
+        cloudCfg.fbUserEmail = "";
+        cloudCfg.fbUserUid = "";
+        cloudCfg.mode = "none";
+        saveCloudCfg();
+        setSyncBadge("", "Гость");
+        if (fbRuntime.auth && fbRuntime.auth.signOut) {
+          fbRuntime.auth.signOut().catch(function () {}).finally(function () { if (onDone) onDone(); });
+        } else if (onDone) {
+          onDone();
+        }
+      }
+
+      function pushCloudState() {
+        if (cloudCfg.mode !== "firebase" || !cloudCfg.fbUserUid) {
+          setSyncBadge("", "Гость");
+          return;
+        }
+        if (syncInFlight) return;
+        syncInFlight = true;
+        setSyncBadge("busy", "⏳ Облако...");
+        ensureFirebaseReady(cloudCfg.fbConfigRaw)
+          .then(function (rt) {
+            var currentUser = rt.auth.currentUser;
+            var uid = (currentUser && currentUser.uid) || cloudCfg.fbUserUid;
+            return rt.db.ref("users/" + uid + "/ege2027").set(buildCloudPayload());
+          })
+          .then(function () { setSyncBadge("ok", "☁️ Google"); })
+          .catch(function () { setSyncBadge("err", "⚠️ Офлайн"); })
+          .finally(function () { syncInFlight = false; });
+      }
+
+      function pullCloudState(forcePushIfNewerLocal) {
+        if (cloudCfg.mode !== "firebase" || !cloudCfg.fbUserUid) {
+          setSyncBadge("", "Гость");
+          return;
+        }
+        setSyncBadge("busy", "⏳ Google...");
+        ensureFirebaseReady(cloudCfg.fbConfigRaw)
+          .then(function (rt) {
+            var currentUser = rt.auth.currentUser;
+            var uid = (currentUser && currentUser.uid) || cloudCfg.fbUserUid;
+            return rt.db.ref("users/" + uid + "/ege2027").once("value");
+          })
+          .then(function (snap) {
+            var val = snap && snap.val();
+            if (val) {
+              var updated = applyMergedRemoteState(val);
+              if (!updated && forcePushIfNewerLocal) { pushCloudState(); return; }
+            } else if (forcePushIfNewerLocal) {
+              pushCloudState();
+              return;
+            }
+            setSyncBadge("ok", "☁️ Google");
+          })
+          .catch(function () { setSyncBadge("err", "⚠️ Офлайн"); });
+      }
+
+      function scheduleCloudSync() {
+        if (cloudCfg.mode === "none") return;
+        setSyncBadge("busy", "⏳ Облако...");
+        if (syncTimer) clearTimeout(syncTimer);
+        syncTimer = setTimeout(function () { pushCloudState(); }, 1500);
+      }
+
+      function saveState(skipCloud) {
+        state.updatedAt = Date.now();
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+          try {
+            state.avatarPhoto = "";
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          } catch (e2) {}
+        }
+        if (!skipCloud) scheduleCloudSync();
+      }
+
+      function registerMistake(cardId) {
+        if (!state.mistakes) state.mistakes = {};
+        state.mistakes[cardId] = 2;
+        saveState();
+      }
+
+      function registerSuccessForMistake(cardId) {
+        if (!state.mistakes || !state.mistakes[cardId]) return;
+        state.mistakes[cardId] = state.mistakes[cardId] - 1;
+        if (state.mistakes[cardId] <= 0) delete state.mistakes[cardId];
+        saveState();
+      }
+
+      function getMistakeIds() {
+        if (!state.mistakes) return [];
+        return Object.keys(state.mistakes).filter(function (id) {
+          return state.mistakes[id] > 0 && CARDS.some(function (c) { return c.id === id; });
+        });
+      }
+
+      function encodeBackupCode() {
+        var copy = JSON.parse(JSON.stringify(state));
+        if (copy.avatarPhoto && copy.avatarPhoto.length > 30000) copy.avatarPhoto = "";
+        return "EGE27:" + btoa(unescape(encodeURIComponent(JSON.stringify(copy))));
+      }
+
+      function decodeAndRestoreBackup(rawCode) {
+        var cleaned = (rawCode || "").trim();
+        if (!cleaned) throw new Error("Вставь код прогресса в поле выше");
+        if (cleaned.indexOf("EGE27:") === 0) cleaned = cleaned.slice(6);
+        var parsed = JSON.parse(decodeURIComponent(escape(atob(cleaned))));
+        if (!parsed || typeof parsed !== "object" || !parsed.srs) {
+          throw new Error("Неверный формат кода резервной копии");
+        }
+        var merged = Object.assign({}, JSON.parse(JSON.stringify(defaultState)), parsed);
+        merged.onboardingCompleted = true;
+        if (merged.pattern === "grid") merged.pattern = "none";
+        state = ensureSRS(merged);
+        saveState();
+        applyAppearance(state.theme, state.pattern);
+      }
+
+      function copyTextToClipboard(text, onDone) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { onDone(true); }).catch(function () { fallbackCopy(text, onDone); });
+        } else {
+          fallbackCopy(text, onDone);
+        }
+      }
+
+      function fallbackCopy(text, onDone) {
+        try {
+          var ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          var ok = document.execCommand("copy");
+          document.body.removeChild(ta);
+          onDone(Boolean(ok));
+        } catch (e) {
+          onDone(false);
+        }
+      }
+
+      function checkStreakOnLoad() {
+        if (!state.lastActiveISO) return;
+        var today = toISO(new Date());
+        var yesterday = toISO(new Date(Date.now() - DAY_MS));
+        if (state.lastActiveISO !== today && state.lastActiveISO !== yesterday) {
+          state.streak = 0;
+          saveState();
+        }
+      }
+
+      function recordAnswer(cardId, quality) {
+        var st = state.srs[cardId];
+        if (!st) {
+          st = { rep: 0, interval: 0, ef: 2.5, nextReview: 0, attempts: 0, correct: 0 };
+          state.srs[cardId] = st;
+        }
+        st.attempts = (st.attempts || 0) + 1;
+        if (quality >= 3) {
+          st.correct = (st.correct || 0) + 1;
+          registerSuccessForMistake(cardId);
+        } else if (quality === 1) {
+          registerMistake(cardId);
+        }
+
+        if (quality === 1) {
+          st.rep = 0;
+          st.interval = 0;
+          st.nextReview = Date.now() + 60 * 1000;
+        } else {
+          if (st.rep === 0) st.interval = quality === 2 ? 0.5 : quality === 3 ? 1 : 4;
+          else if (st.rep === 1) st.interval = quality === 2 ? 1 : quality === 3 ? 3 : 6;
+          else {
+            var mult = quality === 2 ? 1.2 : quality === 3 ? st.ef : st.ef * 1.3;
+            st.interval = Math.max(1, Math.round(st.interval * mult));
+          }
+          st.rep += 1;
+          st.ef = Math.max(1.3, st.ef + (quality === 2 ? -0.15 : quality === 4 ? 0.15 : 0));
+          st.nextReview = Date.now() + st.interval * DAY_MS;
+        }
+
+        var today = toISO(new Date());
+        var yesterday = toISO(new Date(Date.now() - DAY_MS));
+        if (state.lastActiveISO !== today) {
+          state.streak = state.lastActiveISO === yesterday ? state.streak + 1 : 1;
+          state.lastActiveISO = today;
+        }
+        state.history[today] = (state.history[today] || 0) + 1;
+        var cardObj = CARDS.find(function (c) { return c.id === cardId; });
+        if (cardObj) {
+          if (!Array.isArray(state.historyDetails[today])) state.historyDetails[today] = [];
+          state.historyDetails[today].push({
+            id: cardObj.id,
+            subject: cardObj.subject,
+            topic: cardObj.topic,
+            title: cardObj.title,
+            ok: quality >= 3
+          });
+        }
+        saveState();
+      }
+
+      function calcSubjectPrediction(sub, baseScore) {
+        var list = CARDS.filter(function (c) { return c.subject === sub; });
+        if (!list.length) return baseScore;
+        var mastered = 0;
+        list.forEach(function (c) {
+          var s = state.srs[c.id];
+          if (s && s.rep >= 1) mastered += 1;
+        });
+        var ratio = mastered / list.length;
+        var gain = Math.round((100 - baseScore) * ratio * 0.85);
+        return Math.min(100, baseScore + gain);
+      }
+
+      function getStats() {
+        var totalAnswered = 0;
+        var totalCorrect = 0;
+        var levels = [
+          { lvl: 1, name: "1. Лёгкий (устный)", total: 0, mastered: 0 },
+          { lvl: 2, name: "2. Средний (задачи)", total: 0, mastered: 0 },
+          { lvl: 3, name: "3. Сложный (№26 / №18 / №8)", total: 0, mastered: 0 }
+        ];
+
+        CARDS.forEach(function (c) {
+          var s = state.srs[c.id] || {};
+          totalAnswered += s.attempts || 0;
+          totalCorrect += s.correct || 0;
+          var idx = c.level - 1;
+          if (levels[idx]) {
+            levels[idx].total += 1;
+            if ((s.rep || 0) >= 1) levels[idx].mastered += 1;
+          }
+        });
+
+        var accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+        var pPhys = calcSubjectPrediction("physics", state.basePhys);
+        var pMath = calcSubjectPrediction("math", state.baseMath);
+        var pRus = calcSubjectPrediction("russian", state.baseRus);
+
+        return {
+          totalAnswered: totalAnswered,
+          accuracy: accuracy,
+          levels: levels,
+          pPhys: pPhys,
+          pMath: pMath,
+          pRus: pRus,
+          sumPredicted: pPhys + pMath + pRus
+        };
+      }
+
+      // =====================================================================
+      // 6. APP NAVIGATION STATE, ONBOARDING, HOME, TRAINER & SETTINGS
+      // =====================================================================
+      var activeTab = "home";
+      var isSettingsOpen = false;
+      var isOnboardingActive = false;
+      var onboardStep = 1;
+      var obName = "";
+      var obGoal = 280;
+
+      var settingsTab = "profile"; // "profile" | "appearance" | "mocks" | "account"
+      var resetConfirmOpen = false;
+
+      var trStep = 1;
+      var trSubject = "all";
+      var trLevel = 0;
+      var trMistakeMode = false;
+      var trQueue = [];
+      var trIdx = 0;
+      var trProblemInst = null;
+      var trStressAnswered = false;
+      var trChoiceAnswered = false;
+      var trCurrentFailed = false;
+
+      // Theory state (Physics only: Step 1 Subject -> Step 2 Sections -> Step 3 Cards + Section Tabs)
+      var thStep = 1;
+      var thSubject = "physics";
+      var thTopic = "mechanics";
+      var thSearch = "";
+      var thHideRhs = false;
+      var thFlipped = {};
+
+      var calYear = new Date().getFullYear();
+      var calMonth = new Date().getMonth();
+      var calSelectedISO = toISO(new Date());
+      var calMode = "month"; // "month" | "week"
+      var draftName = "";
+      var draftPhoto = "";
+      var draftTheme = "graphite";
+      var draftPattern = "none";
+      var draftPhys = 60;
+      var draftMath = 60;
+      var draftRus = 60;
+      var draftGoal = 280;
+      var draftFbConfig = "";
+
+      function syncSettingsDrafts() {
+        draftName = state.name || "Ученик";
+        draftPhoto = state.avatarPhoto || "";
+        draftTheme = state.theme || "graphite";
+        draftPattern = state.pattern === "grid" ? "none" : (state.pattern || "none");
+        draftPhys = state.basePhys;
+        draftMath = state.baseMath;
+        draftRus = state.baseRus;
+        draftGoal = state.goalSum;
+        draftFbConfig = cloudCfg.fbConfigRaw || "";
+      }
+
+      function startOnboarding() {
+        isOnboardingActive = true;
+        isSettingsOpen = false;
+        onboardStep = 1;
+        obName = "";
+        obGoal = state.goalSum || 280;
+        var nav = document.getElementById("bottomNav");
+        if (nav) nav.style.display = "none";
+        var hdr = document.getElementById("headerTitle");
+        if (hdr) hdr.textContent = "ЕГЭ-2027";
+        renderApp();
+      }
+
+      function renderOnboardingView(root) {
+        var stepHtml = "";
+        if (onboardStep === 1) {
+          stepHtml =
+            '<div class="step-animate">' +
+              '<div class="onboard-title">Как к тебе обращаться?</div>' +
+              '<div class="onboard-desc">Введи никнейм или имя для своего профиля подготовки.</div>' +
+              '<input id="inpObNick" class="text-input" style="width:100%; margin-bottom:14px;" type="text" maxlength="24" value="' + escapeHtml(obName) + '" placeholder="Введи свой никнейм" autocomplete="off" />' +
+              '<button id="btnObNext1" class="btn-primary" type="button">Продолжить →</button>' +
+            '</div>';
+        } else if (onboardStep === 2) {
+          stepHtml =
+            '<div class="step-animate">' +
+              '<div class="onboard-title">Твоя цель на ЕГЭ-2027</div>' +
+              '<div class="onboard-desc">Выбери желаемую сумму баллов за 3 экзамена.</div>' +
+              '<div class="slider-block" style="margin-bottom:16px; border-color:var(--accent);">' +
+                '<div class="slider-head"><span>Целевая сумма баллов</span><span id="lblObGoal" class="slider-val">' + obGoal + '+</span></div>' +
+                '<input id="rngObGoal" type="range" min="150" max="300" step="5" value="' + obGoal + '" />' +
+              '</div>' +
+              '<button id="btnObNext2" class="btn-primary" type="button">Подтвердить →</button>' +
+            '</div>';
+        } else {
+          stepHtml =
+            '<div class="step-animate">' +
+              '<div class="onboard-title">Сохранение прогресса</div>' +
+              '<div class="onboard-desc">Войди через Google для синхронизации между устройствами или начни локально как гость.</div>' +
+              '<button id="btnObGoogle" class="google-oauth-btn" style="margin-bottom:10px;" type="button">' + getGoogleSvg() + '<span>Войти через Google</span></button>' +
+              '<button id="btnObGuest" class="btn-secondary" type="button">Продолжить как гость</button>' +
+              '<div id="obAuthMsg" class="status-msg" style="margin-top:10px;"></div>' +
+            '</div>';
+        }
+
+        root.innerHTML =
+          '<div class="onboard-wrap">' +
+            '<div class="onboard-card">' +
+              '<div class="onboard-progress">' +
+                '<div class="onboard-bar active"></div>' +
+                '<div class="onboard-bar' + (onboardStep >= 2 ? ' active' : '') + '"></div>' +
+                '<div class="onboard-bar' + (onboardStep >= 3 ? ' active' : '') + '"></div>' +
+              '</div>' +
+              stepHtml +
+            '</div>' +
+          '</div>';
+
+        if (onboardStep === 1) {
+          var inp = document.getElementById("inpObNick");
+          var next1 = function () {
+            obName = (inp ? inp.value : "").trim() || "Ученик";
+            onboardStep = 2;
+            renderApp();
+          };
+          var btn1 = document.getElementById("btnObNext1");
+          if (btn1) btn1.addEventListener("click", next1);
+          if (inp) inp.addEventListener("keydown", function (e) { if (e.key === "Enter") next1(); });
+        } else if (onboardStep === 2) {
+          var rng = document.getElementById("rngObGoal");
+          var lbl = document.getElementById("lblObGoal");
+          if (rng && lbl) {
+            rng.addEventListener("input", function () {
+              obGoal = parseInt(rng.value, 10) || 280;
+              lbl.textContent = obGoal + "+";
+            });
+          }
+          var btn2 = document.getElementById("btnObNext2");
+          if (btn2) btn2.addEventListener("click", function () { onboardStep = 3; renderApp(); });
+        } else {
+          var complete = function () {
+            state.name = obName || "Ученик";
+            state.goalSum = obGoal || 280;
+            state.onboardingCompleted = true;
+            saveState();
+            isOnboardingActive = false;
+            switchTab("home");
+          };
+          var btnGuest = document.getElementById("btnObGuest");
+          if (btnGuest) btnGuest.addEventListener("click", complete);
+          var btnGoogle = document.getElementById("btnObGoogle");
+          if (btnGoogle) {
+            btnGoogle.addEventListener("click", function () {
+              var msg = document.getElementById("obAuthMsg");
+              if (msg) {
+                msg.textContent = "Открываем окно входа Google...";
+                msg.className = "status-msg show fb-ok";
+              }
+              signInWithGoogleFirebase(cloudCfg.fbConfigRaw, function (err) {
+                if (err) {
+                  if (msg) { msg.textContent = err.message; msg.className = "status-msg show fb-err"; }
+                  return;
+                }
+                complete();
+              });
+            });
+          }
+        }
+      }
+
+      function switchTab(tab) {
+        activeTab = tab;
+        isOnboardingActive = false;
+        isSettingsOpen = (tab === "settings");
+        if (isSettingsOpen) {
+          syncSettingsDrafts();
+          resetConfirmOpen = false;
+        }
+        var nav = document.getElementById("bottomNav");
+        if (nav) nav.style.display = "block";
+        var titles = { home: "Главная", trainer: "Тренажёр", theory: "Теория", settings: "Настройки", calendar: "Календарь" };
+        var hdr = document.getElementById("headerTitle");
+        if (hdr) hdr.textContent = titles[tab] || "ЕГЭ-2027";
+        document.querySelectorAll(".nav-btn").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-tab") === tab);
+        });
+        renderApp();
+        window.scrollTo(0, 0);
+      }
+
+      function renderApp() {
+        var root = document.getElementById("appRoot");
+        if (!root) return;
+        try {
+          if (isOnboardingActive) { renderOnboardingView(root); return; }
+          if (activeTab === "settings" || isSettingsOpen) { renderSettingsView(root); return; }
+          if (activeTab === "home") renderHomeView(root);
+          else if (activeTab === "trainer") renderTrainerView(root);
+          else if (activeTab === "theory") renderTheoryView(root);
+          else if (activeTab === "calendar") renderCalendarView(root);
+        } catch (err) {
+          root.innerHTML =
+            '<div class="card">' +
+              '<div class="card-title">Ошибка отображения</div>' +
+              '<div class="card-sub" style="margin-top:6px;">' + escapeHtml(err && err.message ? err.message : String(err)) + '</div>' +
+              '<button id="recoverBtn" class="btn-primary" style="margin-top:12px;" type="button">Восстановить экран</button>' +
+            '</div>';
+          var rec = document.getElementById("recoverBtn");
+          if (rec) rec.addEventListener("click", function () { switchTab("home"); });
+        }
+      }
+
+      // =====================================================================
+      // TAB 1: HOME (CLEAN DASHBOARD WITHOUT QUICK START)
+      // =====================================================================
+      function renderHomeView(root) {
+        var st = getStats();
+        var mistakeIds = getMistakeIds();
+        var mistakeCount = mistakeIds.length;
+        var goalPct = Math.min(100, Math.round((st.sumPredicted / state.goalSum) * 100));
+
+        var levelsHtml = st.levels.map(function (lv) {
+          var pct = lv.total > 0 ? Math.round((lv.mastered / lv.total) * 100) : 0;
+          return '<div style="margin-top:12px;">' +
+            '<div class="stat-row" style="margin-top:0;">' +
+              '<span>' + escapeHtml(lv.name) + '</span>' +
+              '<span style="color:var(--text-muted);">' + lv.mastered + ' из ' + lv.total + '</span>' +
+            '</div>' +
+            '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%;"></div></div>' +
+          '</div>';
+        }).join("");
+
+        var mistakesCardHtml = mistakeCount > 0
+          ? '<div class="card mistake-card">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">' +
+                '<div class="card-title">Мои ошибки</div>' +
+                '<span class="mistake-pill">● ' + mistakeCount + ' на отработку</span>' +
+              '</div>' +
+              '<div class="card-sub" style="margin-top:6px;">Карточки, где были промахи. Чтобы закрыть ошибку, ответь на неё верно 2 раза подряд.</div>' +
+              '<button id="btnStartMistakes" class="btn-primary" style="margin-top:12px;" type="button">Отработать ошибки (' + mistakeCount + ')</button>' +
+            '</div>'
+          : '<div class="card mistake-card clean">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">' +
+                '<div class="card-title">Мои ошибки</div>' +
+                '<span class="lvl-badge lvl-1">0 активных</span>' +
+              '</div>' +
+              '<div class="card-sub" style="margin-top:6px;">Ошибок нет — отличный темп! Все проблемные карточки закрыты.</div>' +
+            '</div>';
+
+        root.innerHTML =
+          '<div class="card">' +
+            '<div class="profile-row">' +
+              '<div class="profile-left">' +
+                '<div class="avatar">' + getAvatarMarkup(state.name, state.avatarPhoto) + '</div>' +
+                '<div style="min-width:0; flex:1;">' +
+                  '<div class="user-name">' + escapeHtml(state.name) + '</div>' +
+                  '<div class="card-sub">ЕГЭ-2027 • Цель: ' + state.goalSum + '+</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="streak-box">' +
+                '<div class="streak-val">🔥 ' + state.streak + '</div>' +
+                '<div class="streak-lbl">дней</div>' +
+              '</div>' +
+            '</div>' +
+            '<button id="btnOpenSettings" class="settings-full-btn" type="button">⚙️ Настройки профиля и темы</button>' +
+          '</div>' +
+
+          '<div class="card">' +
+            '<div style="display:flex; justify-content:space-between; align-items:baseline;">' +
+              '<div class="card-title">Прогнозируемый балл</div>' +
+              '<div style="font-size:18px; font-weight:800; color:var(--accent);">' + st.sumPredicted + ' / ' + state.goalSum + '</div>' +
+            '</div>' +
+            '<div class="card-sub">Расчёт по текущей базе пробников и освоению тем</div>' +
+            '<div class="score-grid">' +
+              '<div class="score-pill"><div class="score-pill-val">' + st.pPhys + '</div><div class="score-pill-lbl">Физика</div></div>' +
+              '<div class="score-pill"><div class="score-pill-val">' + st.pMath + '</div><div class="score-pill-lbl">Профмат</div></div>' +
+              '<div class="score-pill"><div class="score-pill-val">' + st.pRus + '</div><div class="score-pill-lbl">Русский</div></div>' +
+            '</div>' +
+            '<div class="progress-track"><div class="progress-fill" style="width:' + goalPct + '%;"></div></div>' +
+          '</div>' +
+
+          mistakesCardHtml +
+
+          '<div class="card">' +
+            '<div class="card-title">Статистика подготовки</div>' +
+            '<div class="stat-row"><span>Решено карточек всего</span><strong>' + st.totalAnswered + '</strong></div>' +
+            '<div class="stat-row"><span>Точность ответов</span><strong>' + st.accuracy + '%</strong></div>' +
+            levelsHtml +
+          '</div>';
+
+        var openSetBtn = document.getElementById("btnOpenSettings");
+        if (openSetBtn) openSetBtn.addEventListener("click", function () { switchTab("settings"); });
+        var startMistakesBtn = document.getElementById("btnStartMistakes");
+        if (startMistakesBtn) startMistakesBtn.addEventListener("click", function () { startMistakesSession(); });
+      }
+
+      // =====================================================================
+      // TAB 2: TRAINER & MY ERRORS SESSION
+      // =====================================================================
+      function startMistakesSession() {
+        var ids = getMistakeIds();
+        var list = CARDS.filter(function (c) { return ids.indexOf(c.id) !== -1; });
+        for (var i = list.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var tmp = list[i]; list[i] = list[j]; list[j] = tmp;
+        }
+        trMistakeMode = true;
+        trQueue = list;
+        trIdx = 0;
+        trProblemInst = null;
+        trStressAnswered = false;
+        trChoiceAnswered = false;
+        trCurrentFailed = false;
+        trStep = 3;
+        switchTab("trainer");
+      }
+
+      function buildQueue(sub, lvl) {
+        var now = Date.now();
+        var filtered = CARDS.filter(function (c) {
+          if (sub !== "all" && c.subject !== sub) return false;
+          if (lvl !== 0 && c.level !== lvl) return false;
+          return true;
+        });
+        var due = filtered.filter(function (c) { return (state.srs[c.id].nextReview || 0) <= now; });
+        var pool = due.length > 0 ? due : filtered;
+        var copy = pool.slice();
+        for (var i = copy.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var tmp = copy[i]; copy[i] = copy[j]; copy[j] = tmp;
+        }
+        return copy;
+      }
+
+      function renderTrainerView(root) {
+        if (trStep === 1) {
+          trMistakeMode = false;
+          var cntAll = CARDS.length;
+          var cntPhys = CARDS.filter(function (c) { return c.subject === "physics"; }).length;
+          var cntMath = CARDS.filter(function (c) { return c.subject === "math"; }).length;
+          var cntRus = CARDS.filter(function (c) { return c.subject === "russian"; }).length;
+
+          root.innerHTML =
+            '<div class="section-label">Шаг 1. Выберите предмет</div>' +
+            '<div class="v-list">' +
+              '<button class="v-card-btn" data-tsub="all" type="button">' +
+                '<div class="v-card-left">' + getSubjectBadgeHtml("all", false) +
+                  '<div><div class="card-title">Все предметы</div><div class="card-sub">Физика, профмат и русский • ' + cntAll + ' карт.</div></div>' +
+                '</div><span class="v-card-arrow">→</span>' +
+              '</button>' +
+              '<button class="v-card-btn" data-tsub="physics" type="button">' +
+                '<div class="v-card-left">' + getSubjectBadgeHtml("physics", false) +
+                  '<div><div class="card-title">Физика</div><div class="card-sub">Механика, МКТ, электродинамика, №26 • ' + cntPhys + ' карт.</div></div>' +
+                '</div><span class="v-card-arrow">→</span>' +
+              '</button>' +
+              '<button class="v-card-btn" data-tsub="math" type="button">' +
+                '<div class="v-card-left">' + getSubjectBadgeHtml("math", false) +
+                  '<div><div class="card-title">Профильная математика</div><div class="card-sub">Тригонометрия, логарифмы, производная, №18 • ' + cntMath + ' карт.</div></div>' +
+                '</div><span class="v-card-arrow">→</span>' +
+              '</button>' +
+              '<button class="v-card-btn" data-tsub="russian" type="button">' +
+                '<div class="v-card-left">' + getSubjectBadgeHtml("russian", false) +
+                  '<div><div class="card-title">Русский язык</div><div class="card-sub">Ударения, Н/НН, корни, задание №8 • ' + cntRus + ' карт.</div></div>' +
+                '</div><span class="v-card-arrow">→</span>' +
+              '</button>' +
+            '</div>';
+
+          root.querySelectorAll("[data-tsub]").forEach(function (btn) {
+            btn.addEventListener("click", function () { trSubject = btn.getAttribute("data-tsub"); trStep = 2; renderApp(); });
+          });
+          return;
+        }
+
+        if (trStep === 2) {
+          var subTitles = { all: "Все предметы", physics: "Физика", math: "Профильная математика", russian: "Русский язык" };
+          var hardSub = "№18, №26, №8 (по выбору)";
+          if (trSubject === "physics") hardSub = "№26 — обоснование и механика (по выбору)";
+          else if (trSubject === "math") hardSub = "№18 — параметры и неравенства №15 (по выбору)";
+          else if (trSubject === "russian") hardSub = "№8 — грамматические нормы (по выбору)";
+
+          function countLvl(l) {
+            return CARDS.filter(function (c) {
+              return (trSubject === "all" || c.subject === trSubject) && (l === 0 || c.level === l);
+            }).length;
+          }
+
+          root.innerHTML =
+            '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">' +
+              '<button id="btnTrBack1" class="back-btn" type="button">← Назад</button>' +
+              '<div style="display:flex; align-items:center; gap:8px;">' +
+                getSubjectBadgeHtml(trSubject, true) +
+                '<span style="font-size:14px; font-weight:700; color:var(--text);">' + subTitles[trSubject] + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="section-label">Шаг 2. Выберите уровень сложности</div>' +
+            '<div class="v-list">' +
+              '<button class="v-card-btn" data-tlvl="0" type="button"><div><div class="card-title">Все уровни</div><div class="card-sub">Смешанная тренировка • ' + countLvl(0) + ' карт.</div></div><span class="v-card-arrow">→</span></button>' +
+              '<button class="v-card-btn" data-tlvl="1" type="button"><div><div class="card-title">1. Лёгкий (устный)</div><div class="card-sub">Быстрая проверка теории, знаков и ударений • ' + countLvl(1) + ' карт.</div></div><span class="v-card-arrow">→</span></button>' +
+              '<button class="v-card-btn" data-tlvl="2" type="button"><div><div class="card-title">2. Средний (письменная задача / практика)</div><div class="card-sub">Генератор задач с новыми числами и разбором • ' + countLvl(2) + ' карт.</div></div><span class="v-card-arrow">→</span></button>' +
+              '<button class="v-card-btn" data-tlvl="3" type="button" style="border-color:rgba(168,85,247,0.35);"><div><div class="card-title" style="color:var(--purple);">3. Сложный</div><div class="card-sub">' + hardSub + ' • ' + countLvl(3) + ' карт.</div></div><span class="v-card-arrow">→</span></button>' +
+            '</div>';
+
+          var back1 = document.getElementById("btnTrBack1");
+          if (back1) back1.addEventListener("click", function () { trStep = 1; renderApp(); });
+          root.querySelectorAll("[data-tlvl]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              trMistakeMode = false;
+              trLevel = parseInt(btn.getAttribute("data-tlvl"), 10) || 0;
+              trQueue = buildQueue(trSubject, trLevel);
+              trIdx = 0;
+              trProblemInst = null;
+              trStressAnswered = false;
+              trChoiceAnswered = false;
+              trCurrentFailed = false;
+              trStep = 3;
+              renderApp();
+            });
+          });
+          return;
+        }
+
+        if (!trQueue.length) {
+          root.innerHTML =
+            '<button id="btnTrBack2" class="back-btn" type="button">' + (trMistakeMode ? '← На Главную' : '← Назад') + '</button>' +
+            '<div class="card" style="margin-top:12px;"><div class="card-title">' + (trMistakeMode ? 'Все ошибки отработаны!' : 'Нет карточек по фильтру') + '</div></div>';
+          var backEmpty = document.getElementById("btnTrBack2");
+          if (backEmpty) {
+            backEmpty.addEventListener("click", function () {
+              if (trMistakeMode) { trMistakeMode = false; trStep = 1; switchTab("home"); }
+              else { trStep = 2; renderApp(); }
+            });
+          }
+          return;
+        }
+
+        if (trIdx >= trQueue.length) {
+          var remMistakes = getMistakeIds().length;
+          root.innerHTML =
+            '<div class="card" style="text-align:center; padding:28px 16px;">' +
+              '<div style="font-size:36px; margin-bottom:8px;">🎉</div>' +
+              '<div class="card-title">' + (trMistakeMode ? 'Круг отработки ошибок завершён!' : 'Сессия завершена!') + '</div>' +
+              '<div class="card-sub" style="margin-top:6px;">' +
+                (trMistakeMode
+                  ? (remMistakes > 0 ? ('Осталось активных ошибок: ' + remMistakes) : 'Все ошибки полностью закрыты!')
+                  : 'Прогресс и интервалы повторения SM-2 сохранены') +
+              '</div>' +
+              (trMistakeMode && remMistakes > 0
+                ? '<button id="btnTrMoreMistakes" class="btn-primary" style="margin-top:18px;" type="button">Продолжить отработку (' + remMistakes + ')</button>'
+                : (!trMistakeMode ? '<button id="btnTrMore" class="btn-primary" style="margin-top:18px;" type="button">Тренировать ещё</button>' : '')) +
+              '<button id="btnTrBackMenu" class="btn-secondary" style="margin-top:10px;" type="button">' + (trMistakeMode ? '← На Главную' : 'Выбрать другой уровень') + '</button>' +
+            '</div>';
+          var btnMoreM = document.getElementById("btnTrMoreMistakes");
+          if (btnMoreM) btnMoreM.addEventListener("click", function () { startMistakesSession(); });
+          var btnMore = document.getElementById("btnTrMore");
+          if (btnMore) {
+            btnMore.addEventListener("click", function () {
+              trQueue = buildQueue(trSubject, trLevel);
+              trIdx = 0; trProblemInst = null; trCurrentFailed = false;
+              renderApp();
+            });
+          }
+          var backMenu = document.getElementById("btnTrBackMenu");
+          if (backMenu) {
+            backMenu.addEventListener("click", function () {
+              if (trMistakeMode) { trMistakeMode = false; trStep = 1; switchTab("home"); }
+              else { trStep = 2; renderApp(); }
+            });
+          }
+          return;
+        }
+
+        var card = trQueue[trIdx];
+        var subNames = { physics: "Физика", math: "Профмат", russian: "Русский" };
+        var lvlClass = card.level === 1 ? "lvl-1" : card.level === 2 ? "lvl-2" : "lvl-3";
+        var lvlText = card.level === 1 ? "1. Лёгкий" : card.level === 2 ? "2. Средний" : "3. Сложный";
+        var remForCard = (state.mistakes && state.mistakes[card.id]) ? state.mistakes[card.id] : 0;
+
+        var topNav =
+          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px;">' +
+            '<button id="btnTrBack2" class="back-btn" type="button">' + (trMistakeMode ? '← На Главную' : '← Назад') + '</button>' +
+            (trMistakeMode && remForCard > 0
+              ? '<span class="mistake-pill">Осталось закрыть: ' + remForCard + '/2</span>'
+              : '<span style="font-size:13px; font-weight:700; color:var(--text-muted);">' + (trIdx + 1) + ' / ' + trQueue.length + '</span>') +
+          '</div>';
+
+        var cardHeaderMeta =
+          '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">' +
+            '<span class="lvl-badge ' + lvlClass + '">' + lvlText + '</span>' +
+            '<div style="display:flex; align-items:center; gap:6px;">' +
+              getSubjectBadgeHtml(card.subject, true) +
+              '<span class="card-sub" style="margin:0;">' + subNames[card.subject] + ' • ' + escapeHtml(card.topic) + '</span>' +
+            '</div>' +
+          '</div>';
+
+        var sm2Html =
+          '<div style="margin-top:14px;">' +
+            '<div class="section-label" style="text-align:center;">Оцени запоминание (SM-2)</div>' +
+            '<div class="sm2-grid">' +
+              '<button class="sm2-btn sm2-1" data-q="1" type="button">Снова<span>1 мин</span></button>' +
+              '<button class="sm2-btn sm2-2" data-q="2" type="button">Трудно<span>12 ч</span></button>' +
+              '<button class="sm2-btn sm2-3" data-q="3" type="button">Хорошо<span>1 дн</span></button>' +
+              '<button class="sm2-btn sm2-4" data-q="4" type="button">Легко<span>4 дн</span></button>' +
+            '</div>' +
+          '</div>';
+
+        var bodyHtml = "";
+
+        if (card.type === "oral") {
+          bodyHtml =
+            '<div class="card">' +
+              cardHeaderMeta +
+              '<div class="card-title">' + escapeHtml(card.title) + '</div>' +
+              '<div style="margin-top:12px; font-size:16px;">' + escapeHtml(card.question) + '</div>' +
+              '<button id="btnShowOral" class="btn-primary" style="margin-top:16px;" type="button">Показать ответ</button>' +
+              '<div id="oralAnswerBox" style="display:none;">' +
+                '<div class="answer-panel">' + escapeHtml(card.answer) + '</div>' +
+                sm2Html +
+              '</div>' +
+            '</div>';
+        } else if (card.type === "problem") {
+          if (!trProblemInst) trProblemInst = card.generate();
+          var p = trProblemInst;
+          bodyHtml =
+            '<div class="card">' +
+              cardHeaderMeta +
+              '<div class="card-title">' + escapeHtml(card.title) + '</div>' +
+              (p.svg ? '<div class="svg-box">' + p.svg + '</div>' : '') +
+              '<div style="margin-top:10px; font-size:16px;">' + escapeHtml(p.text) + '</div>' +
+              '<div id="probInputWrap" class="input-row">' +
+                '<input id="inpProbAns" class="text-input" type="text" inputmode="decimal" placeholder="Ответ' + (p.unit ? ' (' + p.unit + ')' : '') + '" />' +
+                '<button id="btnCheckProb" class="btn-primary" type="button">OK</button>' +
+              '</div>' +
+              '<div id="probResultBox" style="display:none;">' +
+                '<div id="probFeedback" class="feedback-banner"></div>' +
+                '<div class="answer-panel">' + p.steps.map(function (s) { return '<div style="margin-bottom:4px;">' + escapeHtml(s) + '</div>'; }).join("") + '</div>' +
+                sm2Html +
+              '</div>' +
+            '</div>';
+        } else if (card.type === "stress") {
+          if (!trProblemInst) trProblemInst = card.generate();
+          var sw = trProblemInst;
+          var vowels = "аеёиоуыэюяАЕЁИОУЫЭЮЯ";
+          var lettersHtml = sw.word.split("").map(function (ch, idx) {
+            var isV = vowels.indexOf(ch) !== -1;
+            if (!isV) return '<span class="letter-btn consonant">' + escapeHtml(ch) + '</span>';
+            return '<button class="letter-btn" data-lidx="' + idx + '" type="button">' + escapeHtml(ch) + '</button>';
+          }).join("");
+
+          bodyHtml =
+            '<div class="card">' +
+              cardHeaderMeta +
+              '<div class="card-title">Нажми на ударную гласную</div>' +
+              '<div class="stress-word-box">' + lettersHtml + '</div>' +
+              '<div id="stressResultBox" style="display:none;">' +
+                '<div id="stressFeedback" class="feedback-banner"></div>' +
+                '<div class="answer-panel"><strong>Верно: ' + escapeHtml(sw.display) + '</strong><div style="margin-top:4px;">' + escapeHtml(sw.hint) + '</div></div>' +
+                sm2Html +
+              '</div>' +
+            '</div>';
+        } else if (card.type === "choice") {
+          if (!trProblemInst) trProblemInst = card.generate();
+          var ch = trProblemInst;
+          var optsHtml = ch.options.map(function (opt) {
+            return '<button class="choice-btn" data-opt="' + escapeHtml(opt) + '" type="button">' + escapeHtml(opt) + '</button>';
+          }).join("");
+
+          bodyHtml =
+            '<div class="card">' +
+              cardHeaderMeta +
+              '<div style="font-size:16px; font-weight:600;">' + escapeHtml(ch.prompt) + '</div>' +
+              '<div id="choiceOptsGrid" class="choice-grid">' + optsHtml + '</div>' +
+              '<div id="choiceResultBox" style="display:none;">' +
+                '<div id="choiceFeedback" class="feedback-banner" style="margin-top:14px;"></div>' +
+                '<div class="answer-panel">' + escapeHtml(ch.explain) + '</div>' +
+                sm2Html +
+              '</div>' +
+            '</div>';
+        }
+
+        root.innerHTML = topNav + bodyHtml;
+
+        var back2 = document.getElementById("btnTrBack2");
+        if (back2) {
+          back2.addEventListener("click", function () {
+            if (trMistakeMode) { trMistakeMode = false; trStep = 1; switchTab("home"); }
+            else { trStep = 2; renderApp(); }
+          });
+        }
+
+        var btnOral = document.getElementById("btnShowOral");
+        if (btnOral) {
+          btnOral.addEventListener("click", function () {
+            btnOral.style.display = "none";
+            var box = document.getElementById("oralAnswerBox");
+            if (box) box.style.display = "block";
+          });
+        }
+
+        var btnCheck = document.getElementById("btnCheckProb");
+        if (btnCheck) {
+          var submitProb = function () {
+            var inpEl = document.getElementById("inpProbAns");
+            var valStr = (inpEl ? inpEl.value : "").trim().replace(",", ".");
+            var userNum = parseFloat(valStr);
+            var target = trProblemInst.answer;
+            var ok = !isNaN(userNum) && Math.abs(userNum - target) <= Math.max(0.05, Math.abs(target) * 0.02);
+            trCurrentFailed = !ok;
+            if (!ok) registerMistake(card.id);
+            var wrap = document.getElementById("probInputWrap");
+            if (wrap) wrap.style.display = "none";
+            var resBox = document.getElementById("probResultBox");
+            var fb = document.getElementById("probFeedback");
+            if (resBox) resBox.style.display = "block";
+            if (fb) {
+              fb.className = "feedback-banner " + (ok ? "fb-ok" : "fb-err");
+              fb.textContent = ok ? ("Верно! Ответ: " + target) : ("Ошибка. Правильный ответ: " + target);
+            }
+          };
+          btnCheck.addEventListener("click", submitProb);
+          var inpP = document.getElementById("inpProbAns");
+          if (inpP) inpP.addEventListener("keydown", function (e) { if (e.key === "Enter") submitProb(); });
+        }
+
+        root.querySelectorAll("[data-lidx]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            if (trStressAnswered) return;
+            trStressAnswered = true;
+            var clicked = parseInt(btn.getAttribute("data-lidx"), 10);
+            var correctIdx = trProblemInst.stressIdx;
+            var ok = clicked === correctIdx;
+            trCurrentFailed = !ok;
+            if (!ok) registerMistake(card.id);
+
+            root.querySelectorAll("[data-lidx]").forEach(function (b) {
+              var i = parseInt(b.getAttribute("data-lidx"), 10);
+              if (i === correctIdx) b.classList.add("correct-letter");
+              else if (i === clicked && !ok) b.classList.add("wrong-letter");
+            });
+
+            var box = document.getElementById("stressResultBox");
+            var fb = document.getElementById("stressFeedback");
+            if (box) box.style.display = "block";
+            if (fb) {
+              fb.className = "feedback-banner " + (ok ? "fb-ok" : "fb-err");
+              fb.textContent = ok ? "Отлично! Ударение верное" : "Неверно";
+            }
+          });
+        });
+
+        root.querySelectorAll("[data-opt]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            if (trChoiceAnswered) return;
+            trChoiceAnswered = true;
+            var chosen = btn.getAttribute("data-opt");
+            var ok = chosen === trProblemInst.correct;
+            trCurrentFailed = !ok;
+            if (!ok) registerMistake(card.id);
+            var grid = document.getElementById("choiceOptsGrid");
+            if (grid) grid.style.display = "none";
+            var box = document.getElementById("choiceResultBox");
+            var fb = document.getElementById("choiceFeedback");
+            if (box) box.style.display = "block";
+            if (fb) {
+              fb.className = "feedback-banner " + (ok ? "fb-ok" : "fb-err");
+              fb.textContent = ok ? ("Верно: " + trProblemInst.correct) : ("Неверно. Правильно: " + trProblemInst.correct);
+            }
+          });
+        });
+
+        root.querySelectorAll("[data-q]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var q = parseInt(btn.getAttribute("data-q"), 10) || 3;
+            var effectiveQ = (trCurrentFailed && q > 1) ? 1 : q;
+            recordAnswer(card.id, effectiveQ);
+            trIdx += 1;
+            trProblemInst = null;
+            trStressAnswered = false;
+            trChoiceAnswered = false;
+            trCurrentFailed = false;
+            renderApp();
+          });
+        });
+      }
+
+      // =====================================================================
+      // TAB 4: CALENDAR (MONTH / WEEK SWITCH + SUBJECT & TOPIC DETAILS)
+      // =====================================================================
+      function parseISODate(iso) {
+        var p = iso.split("-").map(Number);
+        return new Date(p[0], p[1] - 1, p[2]);
+      }
+
+      function getMondayOfWeek(dateObj) {
+        var d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+        var day = d.getDay();
+        var diff = day === 0 ? -6 : (1 - day);
+        d.setDate(d.getDate() + diff);
+        return d;
+      }
+
+      function renderCalendarView(root) {
+        var todayISO = toISO(new Date());
+        var subLabels = { physics: "Физика", math: "Профильная математика", russian: "Русский язык" };
+        var dowShort = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+
+        // Only include cards that were actually started (nextReview > 0) so untouched cards don't clutter today
+        var dueByDate = {};
+        CARDS.forEach(function (c) {
+          var st = state.srs[c.id];
+          if (!st || !st.nextReview || st.nextReview <= 0) return;
+          var dISO = st.nextReview <= Date.now() ? todayISO : toISO(new Date(st.nextReview));
+          if (!dueByDate[dISO]) dueByDate[dISO] = [];
+          dueByDate[dISO].push(c);
+        });
+
+        var modeSwitchHtml =
+          '<div class="cal-mode-switch">' +
+            '<button id="btnCalMonth" class="cal-mode-btn' + (calMode === "month" ? " active" : "") + '" type="button">📅 Месяц</button>' +
+            '<button id="btnCalWeek" class="cal-mode-btn' + (calMode === "week" ? " active" : "") + '" type="button">🗓️ Неделя</button>' +
+          '</div>';
+
+        var topCardHtml = "";
+        var detailCardHtml = "";
+
+        if (calMode === "month") {
+          var firstDay = new Date(calYear, calMonth, 1);
+          var monthTitle = firstDay.toLocaleDateString("ru-RU", { month: "long", year: "numeric" });
+          monthTitle = monthTitle.charAt(0).toUpperCase() + monthTitle.slice(1);
+
+          var dow = firstDay.getDay();
+          var offset = dow === 0 ? 6 : dow - 1;
+          var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+          var cells = "";
+          for (var i = 0; i < offset; i++) cells += '<div class="cal-cell empty"></div>';
+          for (var day = 1; day <= daysInMonth; day++) {
+            var iso = toISO(new Date(calYear, calMonth, day));
+            var hasAct = (state.history[iso] || 0) > 0;
+            var hasDue = (dueByDate[iso] || []).length > 0;
+            var cls = "cal-cell" + (iso === todayISO ? " today" : "") + (iso === calSelectedISO ? " selected" : "");
+            cells +=
+              '<button class="' + cls + '" data-cdate="' + iso + '" type="button">' +
+                '<span>' + day + '</span>' +
+                '<div class="cal-dots">' +
+                  (hasAct ? '<span class="dot-active"></span>' : '') +
+                  (hasDue ? '<span class="dot-due"></span>' : '') +
+                '</div>' +
+              '</button>';
+          }
+
+          topCardHtml =
+            '<div class="card">' +
+              modeSwitchHtml +
+              '<div class="cal-header">' +
+                '<button id="btnPrevCal" class="back-btn" type="button">‹</button>' +
+                '<div class="card-title">' + escapeHtml(monthTitle) + '</div>' +
+                '<button id="btnNextCal" class="back-btn" type="button">›</button>' +
+              '</div>' +
+              '<div class="cal-grid">' +
+                '<div class="cal-dow">Пн</div><div class="cal-dow">Вт</div><div class="cal-dow">Ср</div>' +
+                '<div class="cal-dow">Чт</div><div class="cal-dow">Пт</div><div class="cal-dow">Сб</div><div class="cal-dow">Вс</div>' +
+                cells +
+              '</div>' +
+              '<div style="display:flex; gap:16px; margin-top:14px; font-size:12px; color:var(--text-muted);">' +
+                '<span style="display:inline-flex; align-items:center; gap:5px;"><span class="dot-active"></span> Решённые занятия</span>' +
+                '<span style="display:inline-flex; align-items:center; gap:5px;"><span class="dot-due"></span> Повторения SM-2</span>' +
+              '</div>' +
+            '</div>';
+
+          var selDate = parseISODate(calSelectedISO);
+          var humanDate = selDate.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
+          var doneCnt = state.history[calSelectedISO] || 0;
+          var doneItems = (state.historyDetails && state.historyDetails[calSelectedISO]) ? state.historyDetails[calSelectedISO] : [];
+          var dueList = dueByDate[calSelectedISO] || [];
+
+          var doneSummaryHtml = "";
+          if (doneItems.length > 0) {
+            var seenTopics = {};
+            doneItems.forEach(function (it) {
+              var key = it.subject + "|" + it.topic;
+              if (!seenTopics[key]) seenTopics[key] = { subject: it.subject, topic: it.topic, count: 0 };
+              seenTopics[key].count += 1;
+            });
+            doneSummaryHtml = '<div class="section-label" style="margin-top:12px;">Пройдено за день</div>' +
+              Object.keys(seenTopics).map(function (k) {
+                var g = seenTopics[k];
+                return '<div class="cal-detail-item">' +
+                  getSubjectBadgeHtml(g.subject, true) +
+                  '<div style="min-width:0; flex:1;">' +
+                    '<div class="cal-detail-meta">' +
+                      '<span class="cal-subject-tag">' + escapeHtml(subLabels[g.subject] || g.subject) + '</span>' +
+                      '<span class="cal-topic-tag">' + escapeHtml(g.topic) + '</span>' +
+                    '</div>' +
+                    '<div class="card-sub">Решено карточек: ' + g.count + '</div>' +
+                  '</div>' +
+                '</div>';
+              }).join("");
+          }
+
+          var dueCompactHtml = dueList.length > 0
+            ? '<div class="section-label" style="margin-top:14px;">План повторений SM-2 (' + dueList.length + ')</div>' +
+              dueList.slice(0, 6).map(function (c) {
+                return '<div class="cal-detail-item">' +
+                  getSubjectBadgeHtml(c.subject, true) +
+                  '<div style="min-width:0; flex:1;">' +
+                    '<div class="cal-detail-meta">' +
+                      '<span class="cal-subject-tag">' + escapeHtml(subLabels[c.subject] || c.subject) + '</span>' +
+                      '<span class="cal-topic-tag">' + escapeHtml(c.topic) + '</span>' +
+                    '</div>' +
+                    '<div style="font-size:14px; font-weight:600;">' + escapeHtml(c.title) + '</div>' +
+                  '</div>' +
+                '</div>';
+              }).join("")
+            : '';
+
+          detailCardHtml =
+            '<div class="card">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">' +
+                '<div class="card-title">' + escapeHtml(humanDate) + '</div>' +
+                '<button id="btnOpenWeekFromDay" class="back-btn" style="font-size:12px; padding:6px 10px;" type="button">Подробнее в неделе →</button>' +
+              '</div>' +
+              '<div class="card-sub" style="margin-top:6px;">' + (doneCnt > 0 ? ('🔥 Решено карточек: ' + doneCnt) : 'Тренировок в этот день не было') + '</div>' +
+              doneSummaryHtml +
+              dueCompactHtml +
+            '</div>';
+        } else {
+          // WEEK VIEW: 7-day strip + rich daily details (subject, topic, solved & scheduled)
+          var selDateObj = parseISODate(calSelectedISO);
+          var weekStart = getMondayOfWeek(selDateObj);
+          var weekEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
+          var weekTitle = weekStart.toLocaleDateString("ru-RU", { day: "numeric", month: "short" }) +
+            " — " + weekEnd.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
+
+          var weekCells = "";
+          var weekDaysArr = [];
+          for (var w = 0; w < 7; w++) {
+            var dObj = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + w);
+            var wIso = toISO(dObj);
+            weekDaysArr.push({ iso: wIso, date: dObj, dow: dowShort[w] });
+            var wAct = (state.history[wIso] || 0) > 0;
+            var wDue = (dueByDate[wIso] || []).length > 0;
+            var wCls = "cal-cell week-cell" + (wIso === todayISO ? " today" : "") + (wIso === calSelectedISO ? " selected" : "");
+            weekCells +=
+              '<button class="' + wCls + '" data-cdate="' + wIso + '" type="button">' +
+                '<span style="font-size:11px; opacity:0.8;">' + dowShort[w] + '</span>' +
+                '<span style="font-size:15px; font-weight:800;">' + dObj.getDate() + '</span>' +
+                '<div class="cal-dots">' +
+                  (wAct ? '<span class="dot-active"></span>' : '') +
+                  (wDue ? '<span class="dot-due"></span>' : '') +
+                '</div>' +
+              '</button>';
+          }
+
+          topCardHtml =
+            '<div class="card">' +
+              modeSwitchHtml +
+              '<div class="cal-header">' +
+                '<button id="btnPrevCal" class="back-btn" type="button">‹</button>' +
+                '<div class="card-title">' + escapeHtml(weekTitle) + '</div>' +
+                '<button id="btnNextCal" class="back-btn" type="button">›</button>' +
+              '</div>' +
+              '<div class="cal-grid">' + weekCells + '</div>' +
+            '</div>';
+
+          // Detailed breakdown for the selected day
+          var selFullTitle = selDateObj.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" });
+          selFullTitle = selFullTitle.charAt(0).toUpperCase() + selFullTitle.slice(1);
+          var selDoneCnt = state.history[calSelectedISO] || 0;
+          var selDoneItems = (state.historyDetails && state.historyDetails[calSelectedISO]) ? state.historyDetails[calSelectedISO] : [];
+          var selDueList = dueByDate[calSelectedISO] || [];
+
+          var solvedDetailHtml = "";
+          if (selDoneItems.length > 0) {
+            solvedDetailHtml = '<div class="section-label" style="margin-top:12px;">✅ Решено за день (' + selDoneItems.length + ')</div>' +
+              selDoneItems.map(function (it) {
+                return '<div class="cal-detail-item">' +
+                  getSubjectBadgeHtml(it.subject, true) +
+                  '<div style="min-width:0; flex:1;">' +
+                    '<div class="cal-detail-meta">' +
+                      '<span class="cal-subject-tag">' + escapeHtml(subLabels[it.subject] || it.subject) + '</span>' +
+                      '<span class="cal-topic-tag">' + escapeHtml(it.topic) + '</span>' +
+                      '<span class="lvl-badge ' + (it.ok ? 'lvl-1' : 'lvl-3') + '" style="padding:2px 7px; font-size:10.5px;">' + (it.ok ? 'Верно' : 'Повтор') + '</span>' +
+                    '</div>' +
+                    '<div style="font-size:14px; font-weight:600;">' + escapeHtml(it.title) + '</div>' +
+                  '</div>' +
+                '</div>';
+              }).join("");
+          } else if (selDoneCnt > 0) {
+            solvedDetailHtml = '<div class="card-sub" style="margin-top:8px;">🔥 Решено карточек: ' + selDoneCnt + '</div>';
+          }
+
+          var dueDetailHtml = "";
+          if (selDueList.length > 0) {
+            dueDetailHtml = '<div class="section-label" style="margin-top:14px;">🔁 Запланировано повторить (' + selDueList.length + ')</div>' +
+              selDueList.map(function (c) {
+                var lvlTxt = c.level === 1 ? "Лёгкий" : c.level === 2 ? "Средний" : "Сложный";
+                return '<div class="cal-detail-item">' +
+                  getSubjectBadgeHtml(c.subject, true) +
+                  '<div style="min-width:0; flex:1;">' +
+                    '<div class="cal-detail-meta">' +
+                      '<span class="cal-subject-tag">' + escapeHtml(subLabels[c.subject] || c.subject) + '</span>' +
+                      '<span class="cal-topic-tag">' + escapeHtml(c.topic) + '</span>' +
+                      '<span class="card-sub" style="margin:0; font-size:11px;">• ' + lvlTxt + '</span>' +
+                    '</div>' +
+                    '<div style="font-size:14px; font-weight:600;">' + escapeHtml(c.title) + '</div>' +
+                  '</div>' +
+                '</div>';
+              }).join("");
+          }
+
+          // Compact week overview list below the selected day
+          var weekOverviewHtml = weekDaysArr.map(function (wd) {
+            var dDone = (state.historyDetails && state.historyDetails[wd.iso]) ? state.historyDetails[wd.iso] : [];
+            var dCnt = state.history[wd.iso] || 0;
+            var dDue = dueByDate[wd.iso] || [];
+            var subjectsMap = {};
+            dDone.forEach(function (x) { subjectsMap[x.subject] = (subjectsMap[x.subject] || 0) + 1; });
+            dDue.forEach(function (x) { if (!subjectsMap[x.subject]) subjectsMap[x.subject] = 0; });
+            var subjTags = Object.keys(subjectsMap).map(function (s) {
+              return '<span class="cal-subject-tag">' + escapeHtml(subLabels[s] || s) + '</span>';
+            }).join("");
+
+            var dHuman = wd.date.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
+            return '<div class="week-summary-card' + (wd.iso === calSelectedISO ? ' selected' : '') + '" data-cdate="' + wd.iso + '">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">' +
+                '<div style="font-size:14px; font-weight:700;">' + wd.dow + ', ' + escapeHtml(dHuman) + (wd.iso === todayISO ? ' • Сегодня' : '') + '</div>' +
+                '<div style="font-size:12px; color:var(--text-muted);">' +
+                  (dCnt > 0 ? ('🔥 ' + dCnt) : '—') +
+                  (dDue.length > 0 ? (' • 🔁 ' + dDue.length) : '') +
+                '</div>' +
+              '</div>' +
+              (subjTags ? '<div class="cal-detail-meta" style="margin-top:6px; margin-bottom:0;">' + subjTags + '</div>' : '<div class="card-sub" style="margin-top:4px;">Нет запланированных тем</div>') +
+            '</div>';
+          }).join("");
+
+          detailCardHtml =
+            '<div class="card">' +
+              '<div class="card-title">' + escapeHtml(selFullTitle) + '</div>' +
+              (!selDoneItems.length && !selDueList.length && !selDoneCnt
+                ? '<div class="card-sub" style="margin-top:6px;">На этот день пока нет решённых карточек и повторений. Реши пару заданий в Тренажёре — и здесь появится подробный разбор по предметам и темам.</div>'
+                : '') +
+              solvedDetailHtml +
+              dueDetailHtml +
+            '</div>' +
+            '<div class="card">' +
+              '<div class="section-label">Обзор всей недели</div>' +
+              weekOverviewHtml +
+            '</div>';
+        }
+
+        root.innerHTML = topCardHtml + detailCardHtml;
+
+        var btnMonth = document.getElementById("btnCalMonth");
+        if (btnMonth) btnMonth.addEventListener("click", function () { calMode = "month"; renderApp(); });
+        var btnWeek = document.getElementById("btnCalWeek");
+        if (btnWeek) btnWeek.addEventListener("click", function () { calMode = "week"; renderApp(); });
+        var btnOpenWeek = document.getElementById("btnOpenWeekFromDay");
+        if (btnOpenWeek) btnOpenWeek.addEventListener("click", function () { calMode = "week"; renderApp(); });
+
+        var prevCal = document.getElementById("btnPrevCal");
+        if (prevCal) {
+          prevCal.addEventListener("click", function () {
+            if (calMode === "month") {
+              calMonth -= 1;
+              if (calMonth < 0) { calMonth = 11; calYear -= 1; }
+            } else {
+              var d = parseISODate(calSelectedISO);
+              d.setDate(d.getDate() - 7);
+              calSelectedISO = toISO(d);
+              calYear = d.getFullYear();
+              calMonth = d.getMonth();
+            }
+            renderApp();
+          });
+        }
+        var nextCal = document.getElementById("btnNextCal");
+        if (nextCal) {
+          nextCal.addEventListener("click", function () {
+            if (calMode === "month") {
+              calMonth += 1;
+              if (calMonth > 11) { calMonth = 0; calYear += 1; }
+            } else {
+              var d = parseISODate(calSelectedISO);
+              d.setDate(d.getDate() + 7);
+              calSelectedISO = toISO(d);
+              calYear = d.getFullYear();
+              calMonth = d.getMonth();
+            }
+            renderApp();
+          });
+        }
+
+        root.querySelectorAll("[data-cdate]").forEach(function (el) {
+          el.addEventListener("click", function () {
+            calSelectedISO = el.getAttribute("data-cdate");
+            var d = parseISODate(calSelectedISO);
+            calYear = d.getFullYear();
+            calMonth = d.getMonth();
+            renderApp();
+          });
+        });
+      }
+
+      // =====================================================================
+      // TAB 4: SETTINGS (4 SUB-TABS + GALLERY-ONLY AVATAR + DRAG-UP RESET)
+      // =====================================================================
+      function compressImage(file, cb) {
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var img = new Image();
+          img.onload = function () {
+            var size = 160, canvas = document.createElement("canvas");
+            canvas.width = size; canvas.height = size;
+            var ctx = canvas.getContext("2d"), side = Math.min(img.width, img.height);
+            ctx.drawImage(img, Math.floor((img.width - side) / 2), Math.floor((img.height - side) / 2), side, side, 0, 0, size, size);
+            try { cb(canvas.toDataURL("image/jpeg", 0.82)); } catch (e) { cb(""); }
+          };
+          img.onerror = function () { cb(""); };
+          img.src = ev.target.result;
+        };
+        reader.onerror = function () { cb(""); };
+        reader.readAsDataURL(file);
+      }
+
+      function bindDragResetSlider(onConfirm) {
+        var track = document.getElementById("dragResetTrack");
+        var knob = document.getElementById("dragResetKnob");
+        var fill = document.getElementById("dragResetFill");
+        if (!track || !knob || !fill) return;
+        var dragging = false, maxLift = 124, currentLift = 0;
+
+        function updatePos(clientY) {
+          var rect = track.getBoundingClientRect();
+          var lift = rect.bottom - clientY - 36;
+          currentLift = Math.max(0, Math.min(maxLift, lift));
+          knob.style.bottom = (6 + currentLift) + "px";
+          fill.style.height = Math.round((currentLift / maxLift) * 100) + "%";
+          if (currentLift >= maxLift - 6) {
+            dragging = false;
+            onConfirm();
+          }
+        }
+
+        knob.addEventListener("pointerdown", function (e) {
+          dragging = true;
+          knob.setPointerCapture(e.pointerId);
+          updatePos(e.clientY);
+        });
+        knob.addEventListener("pointermove", function (e) { if (dragging) updatePos(e.clientY); });
+        knob.addEventListener("pointerup", function () {
+          if (!dragging) return;
+          dragging = false;
+          currentLift = 0;
+          knob.style.bottom = "6px";
+          fill.style.height = "0%";
+        });
+      }
+
+      function renderSettingsView(root) {
+        var topBackHtml =
+          '<div style="margin-bottom:12px;">' +
+            '<button id="btnCloseSettings" class="back-btn" type="button">← Назад</button>' +
+          '</div>';
+
+        var tabsHtml =
+          '<div class="settings-tabs">' +
+            '<button class="stab-btn' + (settingsTab === "profile" ? " active" : "") + '" data-stab="profile" type="button">👤 Профиль</button>' +
+            '<button class="stab-btn' + (settingsTab === "appearance" ? " active" : "") + '" data-stab="appearance" type="button">🎨 Оформление</button>' +
+            '<button class="stab-btn' + (settingsTab === "mocks" ? " active" : "") + '" data-stab="mocks" type="button">📊 Пробники</button>' +
+            '<button class="stab-btn' + (settingsTab === "account" ? " active" : "") + '" data-stab="account" type="button">☁️ Аккаунт и бэкап</button>' +
+          '</div>';
+
+        var bodyHtml = "";
+
+        if (settingsTab === "profile") {
+          bodyHtml =
+            '<div class="card" style="display:flex; flex-direction:column; gap:14px;">' +
+              '<div class="card-title">Имя и аватарка</div>' +
+              '<div><div class="section-label">Твой ник или имя</div><input id="inpNick" class="text-input" style="width:100%;" type="text" maxlength="24" value="' + escapeHtml(draftName) + '" placeholder="Ученик" /></div>' +
+              '<div><div class="section-label">Фото профиля из галереи</div>' +
+                '<div class="photo-upload-row">' +
+                  '<div class="avatar-preview-lg">' + getAvatarMarkup(draftName, draftPhoto) + '</div>' +
+                  '<div style="flex:1; min-width:0;">' +
+                    '<label class="upload-label-btn" for="inpPhotoFile">📷 Выбрать из галереи</label>' +
+                    '<input id="inpPhotoFile" type="file" accept="image/*" style="display:none;" />' +
+                    (draftPhoto ? '<button id="btnRemovePhoto" class="remove-photo-btn" type="button">Удалить фото</button>' : '') +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<button id="btnSaveProfile" class="btn-primary" type="button">Сохранить профиль</button>' +
+              '<div id="profileStatusMsg" class="status-msg"></div>' +
+            '</div>';
+        } else if (settingsTab === "appearance") {
+          var themesHtml = THEMES.map(function (t) {
+            var bgGrad = "linear-gradient(135deg, " + t.vars["--bg"] + " 50%, " + t.vars["--accent"] + " 50%)";
+            return '<button class="theme-opt' + (t.id === draftTheme ? " selected" : "") + '" data-tid="' + t.id + '" type="button"><span class="theme-swatch" style="background:' + bgGrad + ';"></span><span>' + escapeHtml(t.name) + '</span></button>';
+          }).join("");
+          var patternsHtml = PATTERNS.map(function (p) {
+            return '<button class="pattern-opt' + (p.id === draftPattern ? " selected" : "") + '" data-pid="' + p.id + '" type="button"><span class="pattern-thumb ' + p.thumbCls + '"></span><span>' + escapeHtml(p.name) + '</span></button>';
+          }).join("");
+          bodyHtml =
+            '<div class="card" style="display:flex; flex-direction:column; gap:14px;">' +
+              '<div class="card-title">Оформление интерфейса</div>' +
+              '<div><div class="section-label">Цветовая тема</div><div class="theme-grid">' + themesHtml + '</div></div>' +
+              '<div><div class="section-label">Узор фона</div><div class="pattern-grid">' + patternsHtml + '</div></div>' +
+            '</div>';
+        } else if (settingsTab === "mocks") {
+          bodyHtml =
+            '<div class="card" style="display:flex; flex-direction:column; gap:10px;">' +
+              '<div class="card-title">Баллы на пробниках</div>' +
+              '<div class="slider-block"><div class="slider-head"><span>Физика</span><span id="lblPhys" class="slider-val">' + draftPhys + '</span></div><input id="rngPhys" type="range" min="0" max="100" value="' + draftPhys + '" /></div>' +
+              '<div class="slider-block"><div class="slider-head"><span>Профильная математика</span><span id="lblMath" class="slider-val">' + draftMath + '</span></div><input id="rngMath" type="range" min="0" max="100" value="' + draftMath + '" /></div>' +
+              '<div class="slider-block"><div class="slider-head"><span>Русский язык</span><span id="lblRus" class="slider-val">' + draftRus + '</span></div><input id="rngRus" type="range" min="0" max="100" value="' + draftRus + '" /></div>' +
+              '<div class="slider-block" style="border-color:var(--accent);"><div class="slider-head"><span>Целевая сумма баллов</span><span id="lblGoal" class="slider-val">' + draftGoal + '</span></div><input id="rngGoal" type="range" min="150" max="300" step="5" value="' + draftGoal + '" /></div>' +
+              '<button id="btnSaveMocks" class="btn-primary" style="margin-top:4px;" type="button">Сохранить баллы</button>' +
+              '<div id="mocksStatusMsg" class="status-msg"></div>' +
+            '</div>';
+        } else {
+          bodyHtml =
+            '<div class="card" style="display:flex; flex-direction:column; gap:12px;">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center;"><div class="card-title">🔐 Аккаунт Google (Firebase)</div><span class="card-sub">' + (cloudCfg.fbUserEmail ? escapeHtml(cloudCfg.fbUserEmail) : 'Гость') + '</span></div>' +
+              '<div class="card-sub">Проект <strong>ege-2027</strong> подключён. Прогресс автоматически синхронизируется с облаком после каждой карточки.</div>' +
+              (cloudCfg.mode === "firebase" && cloudCfg.fbUserEmail
+                ? '<button id="btnGoogleSignOut" class="btn-secondary" type="button">Выйти из Google-аккаунта</button>'
+                : '<button id="btnGoogleSignIn" class="google-oauth-btn" type="button">' + getGoogleSvg() + '<span>Войти через Google</span></button>') +
+              '<div id="cloudStatusMsg" class="status-msg"></div>' +
+            '</div>' +
+
+            '<div class="card" style="display:flex; flex-direction:column; gap:10px;">' +
+              '<div class="card-title">📦 Резервная копия (офлайн-код)</div>' +
+              '<button id="btnCopyBackup" class="btn-secondary" type="button">📋 Скопировать код прогресса</button>' +
+              '<textarea id="txtBackupCode" class="backup-textarea" placeholder="Вставь сюда код EGE27:..."></textarea>' +
+              '<button id="btnRestoreBackup" class="btn-secondary" type="button">📥 Восстановить из кода</button>' +
+              '<div id="backupStatusMsg" class="status-msg"></div>' +
+            '</div>' +
+
+            '<div class="card" style="border-color:rgba(239,68,68,0.35);">' +
+              '<div class="card-title" style="color:var(--red);">Опасная зона</div>' +
+              '<div class="card-sub" style="margin-top:4px;">Удаляет всю историю решений, статистику и список ошибок на этом устройстве.</div>' +
+              (!resetConfirmOpen
+                ? '<button id="btnOpenResetTest" class="danger-btn" type="button">Сбросить весь прогресс</button>'
+                : '<div class="drag-reset-box">' +
+                    '<div style="font-size:13px; font-weight:700; color:var(--red);">Потяни красную кнопку вверх до конца</div>' +
+                    '<div id="dragResetTrack" class="drag-track">' +
+                      '<div id="dragResetFill" class="drag-fill"></div>' +
+                      '<div class="drag-target-zone">СБРОС</div>' +
+                      '<div id="dragResetKnob" class="drag-knob">↑</div>' +
+                    '</div>' +
+                    '<button id="btnCancelResetTest" class="btn-secondary" type="button">Отмена</button>' +
+                  '</div>') +
+            '</div>';
+        }
+
+        root.innerHTML = topBackHtml + tabsHtml + bodyHtml;
+
+        var closeSettingsBtn = document.getElementById("btnCloseSettings");
+        if (closeSettingsBtn) closeSettingsBtn.addEventListener("click", function () { switchTab("home"); });
+
+        root.querySelectorAll("[data-stab]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            settingsTab = btn.getAttribute("data-stab");
+            resetConfirmOpen = false;
+            renderApp();
+          });
+        });
+
+        if (settingsTab === "profile") {
+          var inpNick = document.getElementById("inpNick");
+          if (inpNick) inpNick.addEventListener("input", function (e) { draftName = e.target.value; });
+          var inpPhoto = document.getElementById("inpPhotoFile");
+          if (inpPhoto) {
+            inpPhoto.addEventListener("change", function (e) {
+              var file = e.target.files && e.target.files[0];
+              if (!file) return;
+              compressImage(file, function (url) { if (url) { draftPhoto = url; renderApp(); } });
+            });
+          }
+          var remPhoto = document.getElementById("btnRemovePhoto");
+          if (remPhoto) remPhoto.addEventListener("click", function () { draftPhoto = ""; renderApp(); });
+          var saveProf = document.getElementById("btnSaveProfile");
+          if (saveProf) {
+            saveProf.addEventListener("click", function () {
+              state.name = (draftName || "").trim() || "Ученик";
+              state.avatarPhoto = draftPhoto;
+              saveState();
+              var msg = document.getElementById("profileStatusMsg");
+              if (msg) { msg.textContent = "Профиль сохранён!"; msg.className = "status-msg show fb-ok"; }
+            });
+          }
+        } else if (settingsTab === "appearance") {
+          root.querySelectorAll("[data-tid]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              draftTheme = btn.getAttribute("data-tid");
+              state.theme = draftTheme;
+              saveState();
+              applyAppearance(state.theme, state.pattern);
+              renderApp();
+            });
+          });
+          root.querySelectorAll("[data-pid]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              draftPattern = btn.getAttribute("data-pid");
+              state.pattern = draftPattern;
+              saveState();
+              applyAppearance(state.theme, state.pattern);
+              renderApp();
+            });
+          });
+        } else if (settingsTab === "mocks") {
+          function bindS(rid, lid, fn) {
+            var r = document.getElementById(rid), l = document.getElementById(lid);
+            if (r && l) r.addEventListener("input", function () { var v = parseInt(r.value, 10) || 0; l.textContent = v; fn(v); });
+          }
+          bindS("rngPhys", "lblPhys", function (v) { draftPhys = v; });
+          bindS("rngMath", "lblMath", function (v) { draftMath = v; });
+          bindS("rngRus", "lblRus", function (v) { draftRus = v; });
+          bindS("rngGoal", "lblGoal", function (v) { draftGoal = v; });
+          var saveM = document.getElementById("btnSaveMocks");
+          if (saveM) {
+            saveM.addEventListener("click", function () {
+              state.basePhys = draftPhys; state.baseMath = draftMath; state.baseRus = draftRus; state.goalSum = draftGoal;
+              saveState();
+              var msg = document.getElementById("mocksStatusMsg");
+              if (msg) { msg.textContent = "Баллы пробников сохранены!"; msg.className = "status-msg show fb-ok"; }
+            });
+          }
+        } else {
+          var txtFb = document.getElementById("txtFbConfig");
+          if (txtFb) txtFb.addEventListener("input", function (e) { draftFbConfig = e.target.value; });
+          var gIn = document.getElementById("btnGoogleSignIn");
+          if (gIn) {
+            gIn.addEventListener("click", function () {
+              var msg = document.getElementById("cloudStatusMsg");
+              signInWithGoogleFirebase(draftFbConfig, function (err, user) {
+                if (err) {
+                  if (msg) { msg.textContent = err.message; msg.className = "status-msg show fb-err"; }
+                  return;
+                }
+                if (msg) { msg.textContent = "Вошли как: " + (user.email || "Google"); msg.className = "status-msg show fb-ok"; }
+                setTimeout(function () { renderApp(); }, 400);
+              });
+            });
+          }
+          var gOut = document.getElementById("btnGoogleSignOut");
+          if (gOut) gOut.addEventListener("click", function () { signOutGoogleFirebase(function () { renderApp(); }); });
+
+          var copyBtn = document.getElementById("btnCopyBackup");
+          if (copyBtn) {
+            copyBtn.addEventListener("click", function () {
+              var code = encodeBackupCode();
+              var ta = document.getElementById("txtBackupCode"), msg = document.getElementById("backupStatusMsg");
+              if (ta) ta.value = code;
+              copyTextToClipboard(code, function (ok) {
+                if (msg) { msg.textContent = ok ? "Код прогресса скопирован!" : "Код в поле выше — скопируй вручную."; msg.className = "status-msg show fb-ok"; }
+              });
+            });
+          }
+          var resBtn = document.getElementById("btnRestoreBackup");
+          if (resBtn) {
+            resBtn.addEventListener("click", function () {
+              var ta = document.getElementById("txtBackupCode"), msg = document.getElementById("backupStatusMsg");
+              try {
+                decodeAndRestoreBackup(ta ? ta.value : "");
+                if (msg) { msg.textContent = "Прогресс восстановлен!"; msg.className = "status-msg show fb-ok"; }
+                setTimeout(function () { switchTab("home"); }, 600);
+              } catch (e) {
+                if (msg) { msg.textContent = e.message; msg.className = "status-msg show fb-err"; }
+              }
+            });
+          }
+          var openReset = document.getElementById("btnOpenResetTest");
+          if (openReset) openReset.addEventListener("click", function () { resetConfirmOpen = true; renderApp(); });
+          var cancelReset = document.getElementById("btnCancelResetTest");
+          if (cancelReset) cancelReset.addEventListener("click", function () { resetConfirmOpen = false; renderApp(); });
+          if (resetConfirmOpen) {
+            bindDragResetSlider(function () {
+              try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+              state = ensureSRS(JSON.parse(JSON.stringify(defaultState)));
+              applyAppearance(state.theme, state.pattern);
+              resetConfirmOpen = false;
+              startOnboarding();
+            });
+          }
+        }
+      }
+
+      // =====================================================================
+      // TAB 3: THEORY (PHYSICS ONLY: SUBJECT -> SECTION TABS -> 3D CARDS)
+      // =====================================================================
+      function renderTheoryView(root) {
+        if (thStep === 1) {
+          var cPhys = THEORY_CARDS.filter(function (c) { return c.subject === "physics"; }).length;
+
+          root.innerHTML =
+            '<div class="section-label">Шаг 1. Выберите предмет</div>' +
+            '<div class="v-list">' +
+              '<button class="v-card-btn" data-thsub="physics" type="button">' +
+                '<div class="v-card-left">' + getSubjectBadgeHtml("physics", false) +
+                  '<div><div class="card-title">Физика</div><div class="card-sub">4 раздела: Механика, МКТ, Электродинамика, Оптика и кванты • ' + cPhys + ' конспектов</div></div>' +
+                '</div><span class="v-card-arrow">→</span>' +
+              '</button>' +
+            '</div>';
+
+          root.querySelectorAll("[data-thsub]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              thSubject = btn.getAttribute("data-thsub");
+              thStep = 2;
+              renderApp();
+            });
+          });
+          return;
+        }
+
+        if (thStep === 2) {
+          var subjectCardsAll = THEORY_CARDS.filter(function (c) { return c.subject === thSubject; });
+          var starCount = subjectCardsAll.filter(function (c) { return state.starredTheory.indexOf(c.id) !== -1; }).length;
+
+          var topicsHtml = (THEORY_TOPICS[thSubject] || []).map(function (t) {
+            var cnt = subjectCardsAll.filter(function (c) { return c.topic === t.id; }).length;
+            return '<button class="v-card-btn" data-thtop="' + t.id + '" type="button">' +
+              '<div>' +
+                '<div class="card-title">' + escapeHtml(t.name) + '</div>' +
+                '<div class="card-sub">' + escapeHtml(t.desc) + ' • ' + cnt + ' карт.</div>' +
+              '</div>' +
+              '<span class="v-card-arrow">→</span>' +
+            '</button>';
+          }).join("");
+
+          root.innerHTML =
+            '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">' +
+              '<button id="btnThBack1" class="back-btn" type="button">← Назад</button>' +
+              '<div style="display:flex; align-items:center; gap:8px;">' +
+                getSubjectBadgeHtml("physics", true) +
+                '<span style="font-size:14px; font-weight:700; color:var(--text);">Физика</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="section-label">Разделы физики</div>' +
+            '<div class="v-list">' +
+              topicsHtml +
+              '<button class="v-card-btn" data-thtop="all" type="button">' +
+                '<div><div class="card-title">Все разделы физики</div><div class="card-sub">Полный конспект кодификатора • ' + subjectCardsAll.length + ' карт.</div></div>' +
+                '<span class="v-card-arrow">→</span>' +
+              '</button>' +
+              '<button class="v-card-btn" data-thtop="starred" type="button" style="border-color:rgba(245,158,11,0.35);">' +
+                '<div><div class="card-title">★ Избранное</div><div class="card-sub">Сохранённые конспекты • ' + starCount + ' карт.</div></div>' +
+                '<span class="v-card-arrow">→</span>' +
+              '</button>' +
+            '</div>';
+
+          var thBack1 = document.getElementById("btnThBack1");
+          if (thBack1) thBack1.addEventListener("click", function () { thStep = 1; renderApp(); });
+
+          root.querySelectorAll("[data-thtop]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              thTopic = btn.getAttribute("data-thtop");
+              thSearch = "";
+              thFlipped = {};
+              thStep = 3;
+              renderApp();
+            });
+          });
+          return;
+        }
+
+        var topicTitle = "Все разделы физики";
+        if (thTopic === "starred") {
+          topicTitle = "★ Избранное";
+        } else if (thTopic !== "all") {
+          var foundTopic = (THEORY_TOPICS[thSubject] || []).find(function (t) { return t.id === thTopic; });
+          if (foundTopic) topicTitle = foundTopic.name;
+        }
+
+        var subjectCards = THEORY_CARDS.filter(function (c) { return c.subject === thSubject; });
+
+        // Section tabs bar inside Physics theory for instant switching
+        var sectionTabsHtml =
+          '<div class="th-pills">' +
+            (THEORY_TOPICS[thSubject] || []).map(function (t) {
+              return '<button class="th-pill' + (thTopic === t.id ? ' active' : '') + '" data-thpill="' + t.id + '" type="button">' + escapeHtml(t.name) + '</button>';
+            }).join("") +
+            '<button class="th-pill' + (thTopic === "all" ? ' active' : '') + '" data-thpill="all" type="button">Все</button>' +
+            '<button class="th-pill' + (thTopic === "starred" ? ' active' : '') + '" data-thpill="starred" type="button">★ Избранное</button>' +
+          '</div>';
+
+        var cards = subjectCards.filter(function (c) {
+          if (thTopic === "starred") {
+            if (state.starredTheory.indexOf(c.id) === -1) return false;
+          } else if (thTopic !== "all" && c.topic !== thTopic) {
+            return false;
+          }
+          if (thSearch.trim()) {
+            var q = thSearch.trim().toLowerCase();
+            var plainExplain = c.explain.replace(/<[^>]+>/g, " ");
+            return (c.name + " " + c.sub + " " + c.unit + " " + plainExplain).toLowerCase().indexOf(q) !== -1;
+          }
+          return true;
+        });
+
+        var cardsHtml = cards.length === 0
+          ? '<div class="card" style="text-align:center; color:var(--text-muted); padding:24px 16px;">' +
+              (thTopic === "starred" ? "Нажми звёздочку ☆ на любой карточке, чтобы добавить её в избранное" : "По запросу ничего не найдено") +
+            '</div>'
+          : cards.map(function (c) {
+              var isStar = state.starredTheory.indexOf(c.id) !== -1;
+              var isFlip = Boolean(thFlipped[c.id]);
+              return '<div class="flip-wrap' + (isFlip ? ' flipped' : '') + '" data-flipid="' + c.id + '">' +
+                '<div class="flip-inner">' +
+                  '<div class="flip-face">' +
+                    '<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">' +
+                      '<div>' +
+                        '<div class="card-title">' + escapeHtml(c.name) + '</div>' +
+                        '<div class="card-sub">' + escapeHtml(c.sub) + '</div>' +
+                      '</div>' +
+                      '<button class="star-btn' + (isStar ? ' starred' : '') + '" data-starid="' + c.id + '" type="button">' + (isStar ? '★' : '☆') + '</button>' +
+                    '</div>' +
+                    '<div class="th-formula-box">' +
+                      '<span>' + c.lhs + '</span>' +
+                      '<span style="color:var(--text-muted);">→</span>' +
+                      '<span class="th-rhs">' + c.rhs + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">' +
+                      '<span class="card-sub">' + escapeHtml(c.unit) + '</span>' +
+                      '<span style="font-size:12px; font-weight:700; color:var(--accent);">Нажми для разбора ↻</span>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="flip-face flip-back">' +
+                    '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">' +
+                      '<div class="card-title" style="color:var(--accent);">' + escapeHtml(c.name) + '</div>' +
+                      '<span style="font-size:12px; color:var(--text-muted); flex-shrink:0;">↻ Назад</span>' +
+                    '</div>' +
+                    '<div class="th-back-body">' + c.explain + '</div>' +
+                    (c.svg ? '<div class="svg-box" style="margin:6px 0 0;">' + c.svg + '</div>' : '') +
+                  '</div>' +
+                '</div>' +
+              '</div>';
+            }).join("");
+
+        root.innerHTML =
+          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">' +
+            '<button id="btnThBack2" class="back-btn" type="button">← Разделы</button>' +
+            '<div style="display:flex; align-items:center; gap:8px;">' +
+              getSubjectBadgeHtml("physics", true) +
+              '<span style="font-size:14px; font-weight:700; color:var(--text);">' + escapeHtml(topicTitle) + '</span>' +
+            '</div>' +
+          '</div>' +
+          sectionTabsHtml +
+          '<div class="input-row" style="margin-top:0; margin-bottom:12px;">' +
+            '<input id="inpThSearch" class="text-input" type="search" value="' + escapeHtml(thSearch) + '" placeholder="Поиск формулы или правила..." />' +
+            '<button id="btnThHide" class="btn-secondary" style="width:auto; padding:12px 14px;" type="button">' + (thHideRhs ? 'Открыть' : 'Скрыть') + '</button>' +
+          '</div>' +
+          '<div class="' + (thHideRhs ? 'blur-rhs' : '') + '">' + cardsHtml + '</div>';
+
+        var thBack2 = document.getElementById("btnThBack2");
+        if (thBack2) thBack2.addEventListener("click", function () { thStep = 2; renderApp(); });
+
+        root.querySelectorAll("[data-thpill]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            thTopic = btn.getAttribute("data-thpill");
+            thFlipped = {};
+            renderApp();
+          });
+        });
+
+        var sInp = document.getElementById("inpThSearch");
+        if (sInp) {
+          sInp.addEventListener("input", function (e) {
+            thSearch = e.target.value;
+            var pos = sInp.selectionStart;
+            renderApp();
+            var nextInp = document.getElementById("inpThSearch");
+            if (nextInp) { nextInp.focus(); nextInp.setSelectionRange(pos, pos); }
+          });
+        }
+
+        var hideBtn = document.getElementById("btnThHide");
+        if (hideBtn) hideBtn.addEventListener("click", function () { thHideRhs = !thHideRhs; renderApp(); });
+
+        root.querySelectorAll("[data-starid]").forEach(function (btn) {
+          btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            var id = btn.getAttribute("data-starid");
+            var idx = state.starredTheory.indexOf(id);
+            if (idx === -1) state.starredTheory.push(id);
+            else state.starredTheory.splice(idx, 1);
+            saveState();
+            renderApp();
+          });
+        });
+
+        root.querySelectorAll("[data-flipid]").forEach(function (el) {
+          el.addEventListener("click", function () {
+            var id = el.getAttribute("data-flipid");
+            thFlipped[id] = !thFlipped[id];
+            el.classList.toggle("flipped", Boolean(thFlipped[id]));
+          });
+        });
+      }
+
+      // =====================================================================
+      // 7. INITIALIZATION & CLEAN HTML EXPORT
+      // =====================================================================
+      function initApp() {
+        requestPersistentStorage();
+        checkStreakOnLoad();
+        applyAppearance(state.theme, state.pattern);
+
+        document.addEventListener("visibilitychange", function () {
+          if (document.visibilityState === "visible" && cloudCfg.mode === "firebase") {
+            pullCloudState(false);
+          }
+        });
+
+        document.querySelectorAll(".nav-btn").forEach(function (btn) {
+          btn.addEventListener("click", function () { switchTab(btn.getAttribute("data-tab")); });
+        });
+
+        var openSettingsHeaderBtn = document.getElementById("openSettingsHeaderBtn");
+        if (openSettingsHeaderBtn) {
+          openSettingsHeaderBtn.addEventListener("click", function () { switchTab("settings"); });
+        }
+
+        var pwaModal = document.getElementById("pwaModal");
+        var openPwaBtn = document.getElementById("openPwaModalBtn");
+        var closePwaBtn = document.getElementById("closePwaModalBtn");
+        var downloadHtmlBtn = document.getElementById("downloadCleanHtmlBtn");
+
+        if (pwaModal) pwaModal.classList.remove("open");
+        if (openPwaBtn && pwaModal) openPwaBtn.addEventListener("click", function () { pwaModal.classList.add("open"); });
+        if (closePwaBtn && pwaModal) closePwaBtn.addEventListener("click", function () { pwaModal.classList.remove("open"); });
+        if (pwaModal) pwaModal.addEventListener("click", function (e) { if (e.target === pwaModal) pwaModal.classList.remove("open"); });
+
+        if (downloadHtmlBtn) {
+          downloadHtmlBtn.addEventListener("click", function () {
+            var clone = document.documentElement.cloneNode(true);
+            var rootEl = clone.querySelector("#appRoot");
+            if (rootEl) rootEl.innerHTML = "";
+            var modalEl = clone.querySelector("#pwaModal");
+            if (modalEl) modalEl.classList.remove("open");
+            var htmlStr = "<!DOCTYPE html>\n" + clone.outerHTML;
+            var blob = new Blob([htmlStr], { type: "text/html;charset=utf-8" });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = "index.html";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+          });
+        }
+
+        if (!state.onboardingCompleted) {
+          startOnboarding();
+        } else {
+          isOnboardingActive = false;
+          switchTab("home");
+          if (cloudCfg.mode === "firebase") pullCloudState(true);
+        }
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initApp);
+      } else {
+        initApp();
+      }
+    })();
+  </script>
+</body>
+</html>
